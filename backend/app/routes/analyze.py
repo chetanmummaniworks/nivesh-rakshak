@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from backend.app.services.verification import build_verification_items
 from backend.app.services.ocr import extract_text_from_image
 from backend.app.services.safety import build_before_you_pay
+from backend.app.services.url_analysis import analyze_urls
 
 router = APIRouter(prefix="/api", tags=["Analysis"])
 
@@ -137,13 +138,16 @@ def analyze_text(text: str):
 )
 
     before_you_pay = build_before_you_pay(
-     text,
-     signals,
-     verification_items
+    text,
+    signals,
+    verification_items
 )
+
+    url_analysis = analyze_urls(text)
 
     result.update(investigation)
     result.update(before_you_pay)
+    result["url_analysis"] = url_analysis
 
     return result
 

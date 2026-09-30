@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./App.css";
 
 const examples = [
@@ -9,6 +9,14 @@ const examples = [
 function App() {
   const [message, setMessage] = useState("");
   const [result, setResult] = useState(null);
+
+  const [isListening, setIsListening] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(true);
+
+  // Speech recognition is kept in a ref so React re-renders
+  // do not interfere with the browser recognition object.
+  const recognitionRef = useRef(null);
+  const shouldKeepListeningRef = useRef(false);
 
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -57,6 +65,7 @@ function App() {
         safetyActions: data.safety_actions || [],
         investigation: data.investigation || null,
         beforeYouPay: data.before_you_pay || null,
+        urlAnalysis: data.url_analysis || null,
       });
     } catch (err) {
       setError(
@@ -108,6 +117,7 @@ function App() {
         extractedText: data.extracted_text || "",
         investigation: data.investigation || null,
         beforeYouPay: data.before_you_pay || null,
+        urlAnalysis: data.url_analysis || null,
       });
     } catch (err) {
       setError(
@@ -186,7 +196,187 @@ function App() {
     return statuses[status] || "REVIEW";
   }
 
+  // -----------------------------
+  // VOICE ANALYSIS
+  // -----------------------------
+  function startVoiceInput() {
+    const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setVoiceSupported(false);
+      setError(
+        "Voice input is not supported in this browser. Try Chrome or Edge."
+      );
+      return;
+    }
+
+    if (recognitionRef.current) {
+      return;
+    }
+
+    setError("");
+
+    const speech = new SpeechRecognition();
+
+    speech.lang = "en-IN";
+
+    // Keep listening through natural pauses.
+    speech.continuous = true;
+
+    // Only add final speech results.
+    // This prevents repeated interim transcripts.
+    speech.interimResults = false;
+
+    speech.maxAlternatives = 1;
+
+    shouldKeepListeningRef.current = true;
+
+    speech.onstart = () => {
+      setIsListening(true);
+      setError("");
+    };
+
+    speech.onresult = (event) => {
+      let finalText = "";
+
+      for (
+        let i = event.resultIndex;
+        i < event.results.length;
+        i++
+      ) {
+        if (event.results[i].isFinal) {
+          finalText += event.results[i][0].transcript;
+        }
+      }
+
+      if (finalText.trim()) {
+        setMessage((previous) => {
+          const separator = previous.trim() ? " " : "";
+
+          return (
+            previous +
+            separator +
+            finalText.trim()
+          );
+        });
+      }
+    };
+
+    speech.onerror = (event) => {
+      console.log(
+        "Speech recognition error:",
+        event.error
+      );
+
+      /*
+        "no-speech" can happen naturally when the user
+        pauses. We don't show an error for it.
+      */
+      if (event.error === "no-speech") {
+        return;
+      }
+
+      if (event.error === "not-allowed") {
+        shouldKeepListeningRef.current = false;
+        recognitionRef.current = null;
+
+        setIsListening(false);
+
+        setError(
+          "Microphone permission was denied. Please allow microphone access and try again."
+        );
+
+        return;
+      }
+
+      if (event.error === "aborted") {
+        return;
+      }
+
+      setError(
+        `Voice input failed: ${event.error}`
+      );
+    };
+
+    speech.onend = () => {
+      /*
+        Some browsers automatically end recognition
+        after a pause.
+
+        If the user did NOT press Stop, restart it.
+      */
+      if (
+        shouldKeepListeningRef.current &&
+        recognitionRef.current === speech
+      ) {
+        try {
+          speech.start();
+          return;
+        } catch (restartError) {
+          console.log(
+            "Speech recognition restart failed:",
+            restartError
+          );
+        }
+      }
+
+      recognitionRef.current = null;
+      setIsListening(false);
+    };
+
+    recognitionRef.current = speech;
+
+    try {
+      speech.start();
+    } catch (startError) {
+      console.log(
+        "Could not start speech recognition:",
+        startError
+      );
+
+      recognitionRef.current = null;
+      shouldKeepListeningRef.current = false;
+
+      setIsListening(false);
+
+      setError(
+        "Could not start voice input. Please try again."
+      );
+    }
+  }
+
+  function stopVoiceInput() {
+    /*
+      This flag is important.
+
+      Without it, onend could immediately restart
+      the microphone after the user presses Stop.
+    */
+    shouldKeepListeningRef.current = false;
+
+    const speech = recognitionRef.current;
+
+    recognitionRef.current = null;
+
+    if (speech) {
+      try {
+        speech.stop();
+      } catch (stopError) {
+        console.log(
+          "Speech recognition already stopped."
+        );
+      }
+    }
+
+    setIsListening(false);
+  }
+
   function clearAnalysis() {
+    // Also stop microphone if the user clears the analysis.
+    stopVoiceInput();
+
     setMessage("");
     setResult(null);
     setFile(null);
@@ -393,10 +583,23 @@ function App() {
 
                 <button
                   type="button"
-                  className="text-button"
-                  onClick={() => setMessage(examples[0])}
+                  className={`voice-button ${
+                    isListening ? "listening" : ""
+                  }`}
+                  onClick={
+                    isListening
+                      ? stopVoiceInput
+                      : startVoiceInput
+                  }
+                  disabled={!voiceSupported}
                 >
-                  Try a sample message
+                  <span>
+                    {isListening ? "■" : "🎙"}
+                  </span>
+
+                  {isListening
+                    ? "Stop Listening"
+                    : "Speak message"}
                 </button>
               </div>
 
@@ -655,6 +858,98 @@ function App() {
                       </div>
                     )}
                   </div>
+                )}
+
+                {/* URL INTELLIGENCE */}
+                {result.urlAnalysis?.urls?.length > 0 && (
+                  <section className="url-intelligence">
+                    <div className="url-intelligence-header">
+                      <div>
+                        <span className="section-kicker">
+                          LINK ANALYSIS
+                        </span>
+
+                        <h3>URL Intelligence</h3>
+
+                        <p>
+                          The link contains characteristics that may deserve
+                          additional verification.
+                        </p>
+                      </div>
+
+                      <span className="url-count">
+                        {result.urlAnalysis.urls.length}
+                        {result.urlAnalysis.urls.length === 1
+                          ? " link"
+                          : " links"}
+                      </span>
+                    </div>
+
+                    <div className="url-list">
+                      {result.urlAnalysis.urls.map((urlInfo, index) => (
+                        <div
+                          className="url-card"
+                          key={`${urlInfo.url}-${index}`}
+                        >
+                          <div className="url-card-top">
+                            <span className="url-number">
+                              {String(index + 1).padStart(2, "0")}
+                            </span>
+
+                            <div className="url-details">
+                              <strong>{urlInfo.hostname}</strong>
+
+                              <small>{urlInfo.url}</small>
+                            </div>
+                          </div>
+
+                          {urlInfo.signals?.length > 0 ? (
+                            <div className="url-signals">
+                              {urlInfo.signals.map(
+                                (signal, signalIndex) => (
+                                  <div
+                                    className="url-signal"
+                                    key={`${signal.type}-${signalIndex}`}
+                                  >
+                                    <span className="url-signal-icon">
+                                      !
+                                    </span>
+
+                                    <div>
+                                      <strong>
+                                        {signal.title}
+                                      </strong>
+
+                                      <p>
+                                        Evidence: {signal.evidence}
+                                      </p>
+                                    </div>
+
+                                    <span
+                                      className={`url-severity ${signal.severity}`}
+                                    >
+                                      {signal.severity.toUpperCase()}
+                                    </span>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          ) : (
+                            <div className="url-no-signals">
+                              No predefined URL characteristics were detected.
+                              This does not establish that the link is safe.
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="url-disclaimer">
+                      <strong>Important:</strong>{" "}
+                      URL characteristics are signals for review, not proof
+                      that a website is fraudulent or legitimate.
+                    </div>
+                  </section>
                 )}
 
                 {/* BEFORE YOU PAY */}
