@@ -3,7 +3,7 @@ from tempfile import NamedTemporaryFile
 from backend.app.ai.investigation import build_investigation
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
-
+from backend.app.services.verification import build_verification_items
 from backend.app.services.ocr import extract_text_from_image
 
 
@@ -125,9 +125,18 @@ def analyze_text(text: str):
         ]
     }
 
-    result.update(
-        build_investigation(text, signals)
-    )
+    investigation = build_investigation(text, signals)
+
+    verification_items = build_verification_items(
+     text,
+     investigation.get("investigation", {}).get("claims", [])
+)
+
+    investigation["investigation"]["verification_items"] = (
+     verification_items
+)
+
+    result.update(investigation)
 
     return result
 

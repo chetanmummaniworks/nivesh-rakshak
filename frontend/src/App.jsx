@@ -153,6 +153,37 @@ function App() {
       .replace(/\b\w/g, (letter) => letter.toUpperCase());
   }
 
+  // -----------------------------
+  // VERIFICATION HELPERS
+  // -----------------------------
+  function formatVerificationCategory(category) {
+    const categories = {
+      regulatory_approval: "REGULATORY CLAIM",
+      government_approval: "GOVERNMENT CLAIM",
+      return_claim: "RETURN CLAIM",
+      advisor_registration: "ADVISOR CLAIM",
+      urgency: "URGENCY",
+      sensitive_information: "SECURITY",
+    };
+
+    return (
+      categories[category] ||
+      category
+        .replaceAll("_", " ")
+        .toUpperCase()
+    );
+  }
+
+  function formatVerificationStatus(status) {
+    const statuses = {
+      requires_verification: "VERIFY INDEPENDENTLY",
+      warning: "REVIEW CAREFULLY",
+      high_priority: "HIGH PRIORITY",
+    };
+
+    return statuses[status] || "REVIEW";
+  }
+
   function clearAnalysis() {
     setMessage("");
     setResult(null);
@@ -287,6 +318,7 @@ function App() {
             <div className="card-heading">
               <div>
                 <span className="card-icon">✳</span>
+
                 <strong>Check an investment message</strong>
               </div>
 
@@ -468,6 +500,7 @@ function App() {
 
                           <div>
                             <strong>Claims detected</strong>
+
                             <small>
                               Claims are not treated as verified facts.
                             </small>
@@ -504,6 +537,7 @@ function App() {
 
                           <div>
                             <strong>Evidence from the message</strong>
+
                             <small>
                               These are the specific phrases that triggered
                               attention.
@@ -530,33 +564,92 @@ function App() {
                       </div>
                     )}
 
-                    {/* VERIFY */}
-                    {result.investigation.verification_items
-                      ?.length > 0 && (
-                      <div className="investigation-block verify-block">
-                        <div className="investigation-block-title">
-                          <span className="investigation-icon">✓</span>
-
+                    {/* VERIFICATION CENTER */}
+                    {result.investigation.verification_items?.length > 0 && (
+                      <div className="verification-center">
+                        <div className="verification-center-header">
                           <div>
-                            <strong>What you should verify</strong>
-                            <small>
-                              Pause and independently check these points
-                              before acting.
-                            </small>
+                            <div className="eyebrow">
+                              VERIFICATION CENTER
+                            </div>
+
+                            <h3>Check these points before you act</h3>
+
+                            <p>
+                              These are claims or behaviors that deserve
+                              independent verification. NiveshRakshak does not
+                              treat them as verified facts.
+                            </p>
                           </div>
+
+                          <span className="verification-count">
+                            {result.investigation.verification_items.length}{" "}
+                            {result.investigation.verification_items.length ===
+                            1
+                              ? "check"
+                              : "checks"}
+                          </span>
                         </div>
 
-                        <ul className="verification-list">
+                        <div className="verification-items">
                           {result.investigation.verification_items.map(
                             (item, index) => (
-                              <li key={`${item.item}-${index}`}>
-                                <strong>{item.item}</strong>
+                              <div
+                                className="verification-item"
+                                key={`${item.category}-${index}`}
+                              >
+                                <div className="verification-item-top">
+                                  <span className="verification-number">
+                                    {String(index + 1).padStart(2, "0")}
+                                  </span>
 
-                                <p>{item.reason}</p>
-                              </li>
+                                  <div>
+                                    <span className="verification-category">
+                                      {formatVerificationCategory(
+                                        item.category
+                                      )}
+                                    </span>
+
+                                    <h4>{item.claim}</h4>
+                                  </div>
+                                </div>
+
+                                <div className="verification-question">
+                                  <span>?</span>
+
+                                  <div>
+                                    <strong>What should I check?</strong>
+
+                                    <p>{item.question}</p>
+                                  </div>
+                                </div>
+
+                                <div className="verification-action">
+                                  <span>✓</span>
+
+                                  <div>
+                                    <strong>Safe next step</strong>
+
+                                    <p>{item.action}</p>
+                                  </div>
+                                </div>
+
+                                <span
+                                  className={`verification-status ${item.status}`}
+                                >
+                                  {formatVerificationStatus(item.status)}
+                                </span>
+                              </div>
                             )
                           )}
-                        </ul>
+                        </div>
+
+                        <div className="verification-disclaimer">
+                          <strong>Important:</strong> A detected claim is not
+                          the same as a verified fact. Always use independently
+                          accessed trusted sources before making financial
+                          decisions.
+                        </div>
                       </div>
                     )}
                   </div>
