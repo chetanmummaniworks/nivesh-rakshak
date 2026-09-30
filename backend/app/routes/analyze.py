@@ -1,6 +1,6 @@
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-
+from backend.app.ai.investigation import build_investigation
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 
@@ -107,7 +107,7 @@ def analyze_text(text: str):
     else:
         risk_level = "low"
 
-    return {
+    result = {
         "risk_level": risk_level,
         "summary": (
             "Multiple warning signals were detected."
@@ -124,6 +124,12 @@ def analyze_text(text: str):
             "Verify important claims through trusted official sources."
         ]
     }
+
+    result.update(
+        build_investigation(text, signals)
+    )
+
+    return result
 
 
 # Text analysis endpoint

@@ -757,3 +757,208 @@ footer > span {
   font-size: 12px;
   line-height: 1.8;
 }
+
+/* =========================================
+   INVESTIGATION REPORT
+   ========================================= */
+
+.investigation-report {
+  margin: 24px 0;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fbfdfc;
+}
+
+.investigation-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 12px;
+}
+
+.investigation-header h3 {
+  margin: 5px 0 0;
+}
+
+.investigation-badge {
+  padding: 6px 10px;
+  border: 1px solid #cfe1d7;
+  border-radius: 999px;
+  background: #f1f8f4;
+  color: #426b55;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.investigation-summary {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.investigation-block {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.investigation-block-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.investigation-block-title strong {
+  display: block;
+  font-size: 12px;
+}
+
+.investigation-block-title small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.investigation-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #edf6f0;
+  color: #397253;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* Claims */
+
+.claims-list {
+  display: grid;
+  gap: 8px;
+}
+
+.claim-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid #dfeae4;
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.claim-card strong {
+  color: #30453b;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.claim-card span {
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #fff6e8;
+  color: #94621c;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Evidence */
+
+.evidence-list {
+  display: grid;
+  gap: 8px;
+}
+
+.evidence-card {
+  padding: 12px 14px;
+  border-left: 3px solid #d5a54a;
+  border-radius: 0 8px 8px 0;
+  background: #fffaf1;
+}
+
+.evidence-quote {
+  color: #60491f;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.evidence-card p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* Verification */
+
+.verify-block {
+  padding-bottom: 2px;
+}
+
+.verification-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 9px;
+}
+
+.verification-list li {
+  position: relative;
+  padding: 12px 14px 12px 36px;
+  border-radius: 9px;
+  background: #f2f8f4;
+  border: 1px solid #d8e9df;
+}
+
+.verification-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 13px;
+  top: 12px;
+  color: #3d7957;
+  font-weight: 800;
+}
+
+.verification-list li strong {
+  display: block;
+  color: #315541;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.verification-list li p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+  .investigation-header {
+    flex-direction: column;
+  }
+
+  .claim-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .investigation-badge {
+    align-self: flex-start;
+  }
+}

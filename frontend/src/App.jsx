@@ -14,79 +14,62 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Existing text analysis
-  function analyzeMessage(event) {
+  // -----------------------------
+  // TEXT ANALYSIS
+  // -----------------------------
+  async function analyzeMessage(event) {
     event.preventDefault();
 
     if (!message.trim()) return;
 
-    const text = message.toLowerCase();
-
-    const rules = [
-      {
-        words: ["guaranteed", "no risk", "risk-free"],
-        title: "Guaranteed return claims",
-        description:
-          "Promises of guaranteed or risk-free investment returns can be a warning sign.",
-      },
-      {
-        words: ["urgent", "limited offer", "act now", "today only"],
-        title: "Urgency and pressure",
-        description:
-          "Pressure to act quickly may discourage careful research before investing.",
-      },
-      {
-        words: ["send money", "transfer", "pay now", "deposit"],
-        title: "Request to transfer money",
-        description:
-          "Verify the recipient and the investment independently before transferring funds.",
-      },
-      {
-        words: ["40%", "double your money", "100% return", "monthly returns"],
-        title: "Unusually high return claims",
-        description:
-          "Very high or fixed return claims deserve careful independent verification.",
-      },
-      {
-        words: ["otp", "password", "upi pin", "bank details"],
-        title: "Sensitive information request",
-        description:
-          "Never share your OTP, password, or UPI PIN with someone claiming to be an advisor.",
-      },
-    ];
-
-    const signals = rules.filter((rule) =>
-      rule.words.some((word) => text.includes(word))
-    );
-
-    const risk =
-      signals.length >= 3
-        ? "High"
-        : signals.length >= 1
-          ? "Moderate"
-          : "Needs review";
-
-    setResult({
-      risk,
-      signals,
-      safetyActions: [
-        "Verify the sender independently.",
-        "Do not share OTPs, passwords, PINs, or authentication information.",
-        "Do not act under pressure or urgency.",
-        "Verify important claims through trusted official sources.",
-      ],
-      summary:
-        signals.length > 0
-          ? `We found ${signals.length} potential warning signal${
-              signals.length > 1 ? "s" : ""
-            } in this message.`
-          : "No warning signals from our current demo rules were detected. This does not mean the message is safe.",
-    });
-
+    setLoading(true);
     setError("");
+    setResult(null);
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: message,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+
+        throw new Error(
+          errorData?.detail || "Unable to analyze the message."
+        );
+      }
+
+      const data = await response.json();
+
+      setResult({
+        risk: formatRisk(data.risk_level),
+        summary: data.summary,
+        signals: formatSignals(data.signals || []),
+        safetyActions: data.safety_actions || [],
+        investigation: data.investigation || null,
+      });
+    } catch (err) {
+      setError(
+        err.message ||
+          "Something went wrong while analyzing the message."
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
-  // Real image analysis through FastAPI
+  // -----------------------------
+  // IMAGE ANALYSIS
+  // -----------------------------
   async function analyzeImage() {
     if (!file) return;
 
@@ -116,24 +99,13 @@ function App() {
 
       const data = await response.json();
 
-      const frontendRisk =
-        data.risk_level === "high"
-          ? "High"
-          : data.risk_level === "medium"
-            ? "Moderate"
-            : "Low";
-
-      const formattedSignals = (data.signals || []).map((signal) => ({
-        title: formatSignalTitle(signal.type),
-        description: signal.evidence,
-      }));
-
       setResult({
-        risk: frontendRisk,
+        risk: formatRisk(data.risk_level),
         summary: data.summary,
-        signals: formattedSignals,
+        signals: formatSignals(data.signals || []),
         safetyActions: data.safety_actions || [],
         extractedText: data.extracted_text || "",
+        investigation: data.investigation || null,
       });
     } catch (err) {
       setError(
@@ -143,6 +115,25 @@ function App() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // -----------------------------
+  // HELPERS
+  // -----------------------------
+  function formatRisk(riskLevel) {
+    if (riskLevel === "high") return "High";
+    if (riskLevel === "medium") return "Moderate";
+    if (riskLevel === "low") return "Low";
+
+    return "Needs review";
+  }
+
+  function formatSignals(signals) {
+    return signals.map((signal) => ({
+      title: formatSignalTitle(signal.type),
+      description: signal.evidence,
+      severity: signal.severity,
+    }));
   }
 
   function formatSignalTitle(type) {
@@ -296,7 +287,6 @@ function App() {
             <div className="card-heading">
               <div>
                 <span className="card-icon">✳</span>
-
                 <strong>Check an investment message</strong>
               </div>
 
@@ -379,8 +369,13 @@ function App() {
               <button
                 className="analyze-button"
                 type="submit"
+                disabled={loading}
               >
-                Analyze for warning signs <span>→</span>
+                {loading
+                  ? "Analyzing message..."
+                  : "Analyze for warning signs"}
+
+                <span>→</span>
               </button>
             </form>
 
@@ -418,7 +413,7 @@ function App() {
                   </div>
                 )}
 
-                {/* SIGNALS */}
+                {/* WARNING SIGNALS */}
                 {result.signals.length > 0 ? (
                   <div className="signals-list">
                     {result.signals.map((signal, index) => (
@@ -441,6 +436,129 @@ function App() {
                     No matching warning patterns found by the current
                     analysis rules. Do not treat this as proof that the
                     message is legitimate.
+                  </div>
+                )}
+
+                {/* INVESTIGATION REPORT */}
+                {result.investigation && (
+                  <div className="investigation-report">
+                    <div className="investigation-header">
+                      <div>
+                        <div className="eyebrow">
+                          INVESTIGATION REPORT
+                        </div>
+
+                        <h3>Why this deserves attention</h3>
+                      </div>
+
+                      <span className="investigation-badge">
+                        Explainable analysis
+                      </span>
+                    </div>
+
+                    <p className="investigation-summary">
+                      {result.investigation.summary}
+                    </p>
+
+                    {/* CLAIMS */}
+                    {result.investigation.claims?.length > 0 && (
+                      <div className="investigation-block">
+                        <div className="investigation-block-title">
+                          <span className="investigation-icon">C</span>
+
+                          <div>
+                            <strong>Claims detected</strong>
+                            <small>
+                              Claims are not treated as verified facts.
+                            </small>
+                          </div>
+                        </div>
+
+                        <div className="claims-list">
+                          {result.investigation.claims.map(
+                            (claim, index) => (
+                              <div
+                                className="claim-card"
+                                key={`${claim.claim}-${index}`}
+                              >
+                                <strong>{claim.claim}</strong>
+
+                                <span>
+                                  {claim.status ===
+                                  "requires_verification"
+                                    ? "Requires independent verification"
+                                    : "Warning claim"}
+                                </span>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* EVIDENCE */}
+                    {result.investigation.evidence?.length > 0 && (
+                      <div className="investigation-block">
+                        <div className="investigation-block-title">
+                          <span className="investigation-icon">E</span>
+
+                          <div>
+                            <strong>Evidence from the message</strong>
+                            <small>
+                              These are the specific phrases that triggered
+                              attention.
+                            </small>
+                          </div>
+                        </div>
+
+                        <div className="evidence-list">
+                          {result.investigation.evidence.map(
+                            (item, index) => (
+                              <div
+                                className="evidence-card"
+                                key={`${item.text}-${index}`}
+                              >
+                                <div className="evidence-quote">
+                                  “{item.text}”
+                                </div>
+
+                                <p>{item.reason}</p>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* VERIFY */}
+                    {result.investigation.verification_items
+                      ?.length > 0 && (
+                      <div className="investigation-block verify-block">
+                        <div className="investigation-block-title">
+                          <span className="investigation-icon">✓</span>
+
+                          <div>
+                            <strong>What you should verify</strong>
+                            <small>
+                              Pause and independently check these points
+                              before acting.
+                            </small>
+                          </div>
+                        </div>
+
+                        <ul className="verification-list">
+                          {result.investigation.verification_items.map(
+                            (item, index) => (
+                              <li key={`${item.item}-${index}`}>
+                                <strong>{item.item}</strong>
+
+                                <p>{item.reason}</p>
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 )}
 
