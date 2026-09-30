@@ -5,7 +5,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from backend.app.services.verification import build_verification_items
 from backend.app.services.ocr import extract_text_from_image
-
+from backend.app.services.safety import build_before_you_pay
 
 router = APIRouter(prefix="/api", tags=["Analysis"])
 
@@ -128,18 +128,24 @@ def analyze_text(text: str):
     investigation = build_investigation(text, signals)
 
     verification_items = build_verification_items(
-     text,
-     investigation.get("investigation", {}).get("claims", [])
+      text,
+      investigation.get("investigation", {}).get("claims", [])
 )
 
     investigation["investigation"]["verification_items"] = (
      verification_items
 )
 
+    before_you_pay = build_before_you_pay(
+     text,
+     signals,
+     verification_items
+)
+
     result.update(investigation)
+    result.update(before_you_pay)
 
     return result
-
 
 # Text analysis endpoint
 @router.post("/analyze")

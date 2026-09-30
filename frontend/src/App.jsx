@@ -56,6 +56,7 @@ function App() {
         signals: formatSignals(data.signals || []),
         safetyActions: data.safety_actions || [],
         investigation: data.investigation || null,
+        beforeYouPay: data.before_you_pay || null,
       });
     } catch (err) {
       setError(
@@ -106,6 +107,7 @@ function App() {
         safetyActions: data.safety_actions || [],
         extractedText: data.extracted_text || "",
         investigation: data.investigation || null,
+        beforeYouPay: data.before_you_pay || null,
       });
     } catch (err) {
       setError(
@@ -653,6 +655,75 @@ function App() {
                       </div>
                     )}
                   </div>
+                )}
+
+                {/* BEFORE YOU PAY */}
+                {result.beforeYouPay && (
+                  <section className="before-you-pay">
+                    <div className="before-you-pay-header">
+                      <div>
+                        <span className="section-kicker">
+                          SAFETY CHECK
+                        </span>
+
+                        <h3>
+                          {result.beforeYouPay.title}
+                        </h3>
+
+                        <p>
+                          {result.beforeYouPay.description}
+                        </p>
+                      </div>
+
+                      <span className="before-you-pay-shield">
+                        🛡
+                      </span>
+                    </div>
+
+                    <div className="before-you-pay-list">
+                      {result.beforeYouPay.checks?.map(
+                        (check, index) => (
+                          <div
+                            className="before-you-pay-item"
+                            key={check.id || index}
+                          >
+                            <div className="before-you-pay-number">
+                              {String(index + 1).padStart(2, "0")}
+                            </div>
+
+                            <div className="before-you-pay-content">
+                              <div className="before-you-pay-item-top">
+                                <h4>
+                                  {check.title}
+                                </h4>
+
+                                <span
+                                  className={`before-you-pay-priority ${
+                                    check.priority || "medium"
+                                  }`}
+                                >
+                                  {String(
+                                    check.priority || "medium"
+                                  ).toUpperCase()}
+                                </span>
+                              </div>
+
+                              <p>
+                                {check.action}
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+
+                    {result.beforeYouPay.disclaimer && (
+                      <div className="before-you-pay-disclaimer">
+                        <strong>Important:</strong>{" "}
+                        {result.beforeYouPay.disclaimer}
+                      </div>
+                    )}
+                  </section>
                 )}
 
                 {/* SAFETY ACTIONS */}
