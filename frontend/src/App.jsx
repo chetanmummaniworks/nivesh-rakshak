@@ -6,21 +6,304 @@ const examples = [
   "Congratulations! You have been selected for an exclusive investment opportunity. Contact our registered advisor for details.",
 ];
 
+const translations = {
+  en: {
+    home: "Home",
+    analyzeMessage: "Analyze message",
+    safetyTips: "Safety tips",
+    demoMode: "Demo mode",
+
+    digitalGuardian: "YOUR DIGITAL INVESTMENT GUARDIAN",
+    heroTitle: "Invest with confidence.",
+    heroTitleAccent: "Stay one step ahead.",
+    heroDescription:
+      "Spot suspicious investment messages before they put your money at risk. Understand warning signs and make informed decisions.",
+    analyzeButton: "Analyze a message",
+
+    messageAnalyzer: "MESSAGE ANALYZER",
+    analyzerTitle: "Think it might be a scam?",
+    analyzerDescription:
+      "Paste the investment message or upload a screenshot to check for potential red flags.",
+
+    screenshot: "Screenshot or image",
+    analyzeScreenshot: "Analyze screenshot",
+    analyzingImage: "Analyzing image...",
+
+    messageOffer: "Message or investment offer",
+    messagePlaceholder:
+      "Paste a WhatsApp message, SMS, email, or investment offer here...",
+
+    speakMessage: "Speak message",
+    stopListening: "Stop Listening",
+
+    analyzeWarning: "Analyze for warning signs",
+    analyzingMessage: "Analyzing message...",
+
+    analysisResults: "ANALYSIS RESULTS",
+    whatFound: "What we found",
+
+    investigationReport: "INVESTIGATION REPORT",
+    investigationTitle: "Why this deserves attention",
+    explainableAnalysis: "Explainable analysis",
+
+    claimsDetected: "Claims detected",
+    claimsDescription:
+      "Claims are not treated as verified facts.",
+
+    evidenceMessage: "Evidence from the message",
+    evidenceDescription:
+      "These are the specific phrases that triggered attention.",
+
+    verificationCenter: "VERIFICATION CENTER",
+    verificationTitle: "Check these points before you act",
+    verificationDescription:
+      "These are claims or behaviors that deserve independent verification. NiveshRakshak does not treat them as verified facts.",
+
+    verificationQuestion: "What should I check?",
+    safeNextStep: "Safe next step",
+
+    linkAnalysis: "LINK ANALYSIS",
+    urlIntelligence: "URL Intelligence",
+    urlDescription:
+      "The link contains characteristics that may deserve additional verification.",
+
+    safetyCheck: "SAFETY CHECK",
+    beforeYouPay: "Before You Pay",
+
+    recommendedSafety: "Recommended safety steps",
+
+    clearAnalysis: "Clear and analyze another message",
+
+    investorAwareness: "INVESTOR AWARENESS",
+    safetyTitle: "Pause. Check. Then decide.",
+    safetyDescription:
+      "Keep these simple precautions in mind when evaluating an offer.",
+
+    tip1Title: "Question guaranteed returns",
+    tip1Description:
+      "Be cautious of promises of unusually high or risk-free profits.",
+
+    tip2Title: "Verify independently",
+    tip2Description:
+      "Check the organization using official sources, not just links in a message.",
+
+    tip3Title: "Never share secret credentials",
+    tip3Description:
+      "Keep your OTP, password, and UPI PIN private.",
+
+    footerDescription:
+      "Built for investor awareness and digital safety.",
+
+    highRisk: "High",
+    moderateRisk: "Moderate",
+    lowRisk: "Low",
+    needsReview: "Needs review",
+
+    noSignals:
+      "No matching warning patterns found by the current analysis rules. Do not treat this as proof that the message is legitimate.",
+
+    investigationNoSignals:
+      "No predefined warning signals were detected. This does not establish that the message is safe.",
+
+    investigationSignals:
+      "warning signal(s) were detected. Review the evidence and independently verify important claims before acting.",
+
+    requiresVerification: "Requires independent verification",
+    warningClaim: "Warning claim",
+
+    verificationCountOne: "check",
+    verificationCountMany: "checks",
+
+    important: "Important:",
+    detectedClaimNotVerified:
+      "A detected claim is not the same as a verified fact. Always use independently accessed trusted sources before making financial decisions.",
+
+    urlCountOne: "link",
+    urlCountMany: "links",
+
+    urlNoSignals:
+      "No predefined URL characteristics were detected. This does not establish that the link is safe.",
+
+    urlEvidence: "Evidence:",
+
+    urlDisclaimer:
+      "URL characteristics are signals for review, not proof that a website is fraudulent or legitimate.",
+
+    priorityHigh: "HIGH",
+    priorityCritical: "CRITICAL",
+    priorityMedium: "MEDIUM",
+
+    beforeYouPayDisclaimer:
+      "These checks provide safety guidance only. They do not establish whether an offer is genuine or fraudulent.",
+
+    extractedText: "Text detected from image",
+
+    selected: "Selected:",
+
+    checkAnalysisFailed: "Analysis failed",
+
+    disclaimer:
+      "This is an educational demo. Results are intended to highlight potential warning signals and should not be treated as proof that a message is fraudulent or legitimate. Always verify important claims independently.",
+  },
+
+  hi: {
+    home: "होम",
+    analyzeMessage: "संदेश का विश्लेषण करें",
+    safetyTips: "सुरक्षा सुझाव",
+    demoMode: "डेमो मोड",
+
+    digitalGuardian: "आपका डिजिटल निवेश सुरक्षा सहायक",
+    heroTitle: "विश्वास के साथ निवेश करें।",
+    heroTitleAccent: "एक कदम आगे रहें।",
+    heroDescription:
+      "संदिग्ध निवेश संदेशों को पहचानें और अपने पैसे को जोखिम में पड़ने से पहले चेतावनी संकेत समझें।",
+    analyzeButton: "संदेश का विश्लेषण करें",
+
+    messageAnalyzer: "संदेश विश्लेषक",
+    analyzerTitle: "क्या यह धोखाधड़ी हो सकती है?",
+    analyzerDescription:
+      "संभावित चेतावनी संकेतों की जांच करने के लिए निवेश संदेश पेस्ट करें या स्क्रीनशॉट अपलोड करें।",
+
+    screenshot: "स्क्रीनशॉट या चित्र",
+    analyzeScreenshot: "स्क्रीनशॉट का विश्लेषण करें",
+    analyzingImage: "चित्र का विश्लेषण हो रहा है...",
+
+    messageOffer: "संदेश या निवेश प्रस्ताव",
+    messagePlaceholder:
+      "WhatsApp संदेश, SMS, ईमेल या निवेश प्रस्ताव यहां पेस्ट करें...",
+
+    speakMessage: "संदेश बोलें",
+    stopListening: "सुनना बंद करें",
+
+    analyzeWarning: "चेतावनी संकेतों के लिए विश्लेषण करें",
+    analyzingMessage: "संदेश का विश्लेषण हो रहा है...",
+
+    analysisResults: "विश्लेषण परिणाम",
+    whatFound: "क्या पाया गया",
+
+    investigationReport: "जांच रिपोर्ट",
+    investigationTitle: "इस पर ध्यान क्यों देना चाहिए",
+    explainableAnalysis: "व्याख्यात्मक विश्लेषण",
+
+    claimsDetected: "दावे पाए गए",
+    claimsDescription:
+      "दावों को सत्यापित तथ्य नहीं माना जाता है।",
+
+    evidenceMessage: "संदेश से प्राप्त प्रमाण",
+    evidenceDescription:
+      "ये वे विशेष शब्द या वाक्य हैं जिनसे चेतावनी मिली।",
+
+    verificationCenter: "सत्यापन केंद्र",
+    verificationTitle: "आगे बढ़ने से पहले इन बिंदुओं की जांच करें",
+    verificationDescription:
+      "इन दावों या व्यवहारों का स्वतंत्र रूप से सत्यापन किया जाना चाहिए। NiveshRakshak इन्हें सत्यापित तथ्य नहीं मानता।",
+
+    verificationQuestion: "मुझे क्या जांचना चाहिए?",
+    safeNextStep: "सुरक्षित अगला कदम",
+
+    linkAnalysis: "लिंक विश्लेषण",
+    urlIntelligence: "URL जानकारी",
+    urlDescription:
+      "इस लिंक में कुछ ऐसी विशेषताएं हैं जिनका अतिरिक्त सत्यापन आवश्यक हो सकता है।",
+
+    safetyCheck: "सुरक्षा जांच",
+    beforeYouPay: "भुगतान करने से पहले",
+
+    recommendedSafety: "अनुशंसित सुरक्षा कदम",
+
+    clearAnalysis: "साफ करें और दूसरा संदेश जांचें",
+
+    investorAwareness: "निवेशक जागरूकता",
+    safetyTitle: "रुकें। जांचें। फिर निर्णय लें।",
+    safetyDescription:
+      "किसी प्रस्ताव का मूल्यांकन करते समय इन सरल सावधानियों को ध्यान में रखें।",
+
+    tip1Title: "गारंटीड रिटर्न पर सवाल करें",
+    tip1Description:
+      "बहुत अधिक या जोखिम-मुक्त मुनाफे के वादों से सावधान रहें।",
+
+    tip2Title: "स्वतंत्र रूप से सत्यापित करें",
+    tip2Description:
+      "किसी संदेश में दिए गए लिंक के बजाय आधिकारिक स्रोतों से संगठन की जांच करें।",
+
+    tip3Title: "गुप्त जानकारी कभी साझा न करें",
+    tip3Description:
+      "अपना OTP, पासवर्ड और UPI PIN निजी रखें।",
+
+    footerDescription:
+      "निवेशक जागरूकता और डिजिटल सुरक्षा के लिए बनाया गया।",
+
+    highRisk: "उच्च",
+    moderateRisk: "मध्यम",
+    lowRisk: "कम",
+    needsReview: "जांच आवश्यक",
+
+    noSignals:
+      "वर्तमान विश्लेषण नियमों में कोई निर्धारित चेतावनी पैटर्न नहीं मिला। इसे संदेश के सही या सुरक्षित होने का प्रमाण न मानें।",
+
+    investigationNoSignals:
+      "कोई निर्धारित चेतावनी संकेत नहीं मिला। इसका अर्थ यह नहीं है कि संदेश सुरक्षित है।",
+
+    investigationSignals:
+      "चेतावनी संकेत मिले हैं। प्रमाण की समीक्षा करें और महत्वपूर्ण दावों को स्वतंत्र रूप से सत्यापित करने के बाद ही आगे बढ़ें।",
+
+    requiresVerification: "स्वतंत्र सत्यापन आवश्यक",
+    warningClaim: "चेतावनी वाला दावा",
+
+    verificationCountOne: "जांच",
+    verificationCountMany: "जांचें",
+
+    important: "महत्वपूर्ण:",
+
+    detectedClaimNotVerified:
+      "पाया गया दावा सत्यापित तथ्य के समान नहीं है। वित्तीय निर्णय लेने से पहले स्वतंत्र रूप से प्राप्त विश्वसनीय स्रोतों का उपयोग करें।",
+
+    urlCountOne: "लिंक",
+    urlCountMany: "लिंक",
+
+    urlNoSignals:
+      "कोई निर्धारित URL विशेषता नहीं मिली। इसका अर्थ यह नहीं है कि लिंक सुरक्षित है।",
+
+    urlEvidence: "प्रमाण:",
+
+    urlDisclaimer:
+      "URL की विशेषताएं केवल समीक्षा के लिए संकेत हैं; वे किसी वेबसाइट को धोखाधड़ी वाला या वैध साबित नहीं करतीं।",
+
+    priorityHigh: "उच्च",
+    priorityCritical: "अत्यंत महत्वपूर्ण",
+    priorityMedium: "मध्यम",
+
+    beforeYouPayDisclaimer:
+      "ये जांच केवल सुरक्षा मार्गदर्शन देती हैं। इनसे यह साबित नहीं होता कि कोई प्रस्ताव वास्तविक है या धोखाधड़ी वाला।",
+
+    extractedText: "चित्र से प्राप्त टेक्स्ट",
+
+    selected: "चयनित:",
+
+    checkAnalysisFailed: "विश्लेषण विफल",
+
+    disclaimer:
+      "यह एक शैक्षणिक डेमो है। परिणाम संभावित चेतावनी संकेतों को दिखाने के लिए हैं और इन्हें संदेश के धोखाधड़ी वाला या वैध होने का प्रमाण नहीं माना जाना चाहिए। महत्वपूर्ण दावों को हमेशा स्वतंत्र रूप से सत्यापित करें।",
+  },
+};
+
 function App() {
+  const [language, setLanguage] = useState("en");
+
   const [message, setMessage] = useState("");
   const [result, setResult] = useState(null);
 
   const [isListening, setIsListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(true);
 
-  // Speech recognition is kept in a ref so React re-renders
-  // do not interfere with the browser recognition object.
   const recognitionRef = useRef(null);
   const shouldKeepListeningRef = useRef(false);
 
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const t = translations[language];
 
   // -----------------------------
   // TEXT ANALYSIS
@@ -59,9 +342,10 @@ function App() {
       const data = await response.json();
 
       setResult({
-        risk: formatRisk(data.risk_level),
+        riskLevel: data.risk_level,
         summary: data.summary,
-        signals: formatSignals(data.signals || []),
+        signalCount: (data.signals || []).length,
+        signals: data.signals || [],
         safetyActions: data.safety_actions || [],
         investigation: data.investigation || null,
         beforeYouPay: data.before_you_pay || null,
@@ -110,9 +394,10 @@ function App() {
       const data = await response.json();
 
       setResult({
-        risk: formatRisk(data.risk_level),
+        riskLevel: data.risk_level,
         summary: data.summary,
-        signals: formatSignals(data.signals || []),
+        signalCount: (data.signals || []).length,
+        signals: data.signals || [],
         safetyActions: data.safety_actions || [],
         extractedText: data.extracted_text || "",
         investigation: data.investigation || null,
@@ -130,34 +415,75 @@ function App() {
   }
 
   // -----------------------------
-  // HELPERS
+  // RISK LOCALIZATION
   // -----------------------------
   function formatRisk(riskLevel) {
-    if (riskLevel === "high") return "High";
-    if (riskLevel === "medium") return "Moderate";
-    if (riskLevel === "low") return "Low";
+    if (riskLevel === "high") return t.highRisk;
+    if (riskLevel === "medium") return t.moderateRisk;
+    if (riskLevel === "low") return t.lowRisk;
 
-    return "Needs review";
+    return t.needsReview;
   }
 
-  function formatSignals(signals) {
-    return signals.map((signal) => ({
-      title: formatSignalTitle(signal.type),
-      description: signal.evidence,
-      severity: signal.severity,
-    }));
+  function getRiskClass(riskLevel) {
+    if (riskLevel === "high") return "high";
+    if (riskLevel === "medium") return "moderate";
+    if (riskLevel === "low") return "low";
+
+    return "needs-review";
   }
 
+  // -----------------------------
+  // SUMMARY LOCALIZATION
+  // -----------------------------
+  function formatSummary(summary, riskLevel, signalCount) {
+    if (language === "en") {
+      return summary;
+    }
+
+    if (!signalCount || signalCount === 0) {
+      return t.investigationNoSignals;
+    }
+
+    if (riskLevel === "high") {
+      return `${signalCount} ${t.investigationSignals}`;
+    }
+
+    if (riskLevel === "medium") {
+      return `${signalCount} चेतावनी संकेत मिले हैं। संदेश की सावधानीपूर्वक समीक्षा करें और महत्वपूर्ण दावों को स्वतंत्र रूप से सत्यापित करें।`;
+    }
+
+    return `${signalCount} चेतावनी संकेत मिले हैं। आगे बढ़ने से पहले संदेश और उसके दावों की जांच करें।`;
+  }
+
+  // -----------------------------
+  // SIGNAL LOCALIZATION
+  // -----------------------------
   function formatSignalTitle(type) {
     const titles = {
-      guaranteed_return: "Guaranteed return claims",
-      urgency: "Urgency and pressure",
-      sensitive_information: "Sensitive information request",
-      authority_claim: "Authority or approval claim",
+      guaranteed_return: {
+        en: "Guaranteed return claims",
+        hi: "गारंटीड रिटर्न का दावा",
+      },
+
+      urgency: {
+        en: "Urgency and pressure",
+        hi: "जल्दी करने का दबाव",
+      },
+
+      sensitive_information: {
+        en: "Sensitive information request",
+        hi: "संवेदनशील जानकारी की मांग",
+      },
+
+      authority_claim: {
+        en: "Authority or approval claim",
+        hi: "प्राधिकरण या मंजूरी का दावा",
+      },
     };
 
     if (titles[type]) {
-      return titles[type];
+      return titles[type][language];
     }
 
     return type
@@ -166,34 +492,332 @@ function App() {
   }
 
   // -----------------------------
+  // CLAIM LOCALIZATION
+  // -----------------------------
+  function formatClaim(claim) {
+    if (language === "en") {
+      return claim;
+    }
+
+    const claims = {
+      "SEBI approval is being claimed":
+        "SEBI की मंजूरी का दावा किया जा रहा है",
+
+      "Government approval is being claimed":
+        "सरकार की मंजूरी का दावा किया जा रहा है",
+
+      "A guaranteed or risk-free financial outcome is being claimed":
+        "गारंटीड या जोखिम-मुक्त वित्तीय परिणाम का दावा किया जा रहा है",
+    };
+
+    return claims[claim] || claim;
+  }
+
+  function formatClaimStatus(status) {
+    if (status === "requires_verification") {
+      return t.requiresVerification;
+    }
+
+    return t.warningClaim;
+  }
+
+  // -----------------------------
+  // EVIDENCE REASON LOCALIZATION
+  // -----------------------------
+  function formatEvidenceReason(reason) {
+    if (language === "en") {
+      return reason;
+    }
+
+    const reasons = {
+      "The message makes an approval claim involving a regulatory authority.":
+        "संदेश किसी नियामक प्राधिकरण की मंजूरी का दावा करता है।",
+
+      "The message uses government approval as a trust signal.":
+        "संदेश भरोसा पैदा करने के लिए सरकारी मंजूरी का उल्लेख करता है।",
+
+      "The message uses certainty or risk-free language about an investment outcome.":
+        "संदेश निवेश के परिणाम के बारे में निश्चित या जोखिम-मुक्त भाषा का उपयोग करता है।",
+
+      "The message creates pressure to act quickly.":
+        "संदेश जल्दी कार्रवाई करने का दबाव बनाता है।",
+
+      "The message appears to request sensitive authentication information.":
+        "संदेश संवेदनशील प्रमाणीकरण जानकारी मांगता हुआ दिखाई देता है।",
+    };
+
+    return reasons[reason] || reason;
+  }
+
+  // -----------------------------
   // VERIFICATION HELPERS
   // -----------------------------
   function formatVerificationCategory(category) {
     const categories = {
-      regulatory_approval: "REGULATORY CLAIM",
-      government_approval: "GOVERNMENT CLAIM",
-      return_claim: "RETURN CLAIM",
-      advisor_registration: "ADVISOR CLAIM",
-      urgency: "URGENCY",
-      sensitive_information: "SECURITY",
+      regulatory_approval: {
+        en: "REGULATORY CLAIM",
+        hi: "नियामक दावा",
+      },
+
+      government_approval: {
+        en: "GOVERNMENT CLAIM",
+        hi: "सरकारी दावा",
+      },
+
+      return_claim: {
+        en: "RETURN CLAIM",
+        hi: "रिटर्न का दावा",
+      },
+
+      advisor_registration: {
+        en: "ADVISOR CLAIM",
+        hi: "सलाहकार का दावा",
+      },
+
+      urgency: {
+        en: "URGENCY",
+        hi: "जल्दबाजी",
+      },
+
+      sensitive_information: {
+        en: "SECURITY",
+        hi: "सुरक्षा",
+      },
     };
 
-    return (
-      categories[category] ||
-      category
-        .replaceAll("_", " ")
-        .toUpperCase()
-    );
+    if (categories[category]) {
+      return categories[category][language];
+    }
+
+    return category
+      .replaceAll("_", " ")
+      .toUpperCase();
+  }
+
+  function formatVerificationClaim(claim) {
+    if (language === "en") {
+      return claim;
+    }
+
+    const claims = {
+      "SEBI approval is being claimed":
+        "SEBI की मंजूरी का दावा किया जा रहा है",
+
+      "Government approval is being claimed":
+        "सरकारी मंजूरी का दावा किया जा रहा है",
+
+      "A guaranteed or risk-free return is being claimed":
+        "गारंटीड या जोखिम-मुक्त रिटर्न का दावा किया जा रहा है",
+
+      "The sender claims to be a registered advisor":
+        "प्रेषक स्वयं को पंजीकृत सलाहकार बताता है",
+
+      "The message creates pressure to act quickly":
+        "संदेश जल्दी कार्रवाई करने का दबाव बनाता है",
+
+      "The message requests sensitive authentication information":
+        "संदेश संवेदनशील प्रमाणीकरण जानकारी मांगता है",
+    };
+
+    return claims[claim] || claim;
+  }
+
+  function formatVerificationQuestion(question) {
+    if (language === "en") {
+      return question;
+    }
+
+    const questions = {
+      "Is the claimed regulatory approval genuine?":
+        "क्या बताई गई नियामक मंजूरी वास्तव में सही है?",
+
+      "Is the claimed government approval genuine?":
+        "क्या बताई गई सरकारी मंजूरी वास्तव में सही है?",
+
+      "What is the basis for the claimed return?":
+        "बताए गए रिटर्न का आधार क्या है?",
+
+      "Is the person or entity actually registered?":
+        "क्या व्यक्ति या संस्था वास्तव में पंजीकृत है?",
+
+      "Can the decision safely wait for independent verification?":
+        "क्या स्वतंत्र सत्यापन होने तक निर्णय को रोका जा सकता है?",
+
+      "Is the sender asking for credentials that should remain private?":
+        "क्या प्रेषक ऐसी जानकारी मांग रहा है जिसे निजी रखा जाना चाहिए?",
+    };
+
+    return questions[question] || question;
+  }
+
+  function formatVerificationAction(action) {
+    if (language === "en") {
+      return action;
+    }
+
+    const actions = {
+      "Independently check the relevant information through an official SEBI source rather than relying on the message.":
+        "संदेश पर निर्भर रहने के बजाय संबंधित जानकारी को आधिकारिक SEBI स्रोत से स्वतंत्र रूप से जांचें।",
+
+      "Verify the claim through an independently accessed official government source.":
+        "इस दावे को स्वतंत्र रूप से खोले गए आधिकारिक सरकारी स्रोत से सत्यापित करें।",
+
+      "Do not treat guaranteed-return language as proof of safety. Independently research the investment and its risks.":
+        "गारंटीड रिटर्न की भाषा को सुरक्षा का प्रमाण न मानें। निवेश और उससे जुड़े जोखिमों की स्वतंत्र रूप से जानकारी लें।",
+
+      "Independently verify the person's or entity's registration using the relevant official source. Do not rely only on registration numbers or links provided in the message.":
+        "संबंधित आधिकारिक स्रोत से व्यक्ति या संस्था का पंजीकरण स्वतंत्र रूप से जांचें। संदेश में दिए गए पंजीकरण नंबर या लिंक पर अकेले निर्भर न रहें।",
+
+      "Pause before acting. Take time to verify the sender, claims, and payment details independently.":
+        "आगे बढ़ने से पहले रुकें। प्रेषक, दावों और भुगतान विवरण को स्वतंत्र रूप से सत्यापित करने के लिए समय लें।",
+
+      "Do not share OTPs, passwords, UPI PINs, or other authentication information.":
+        "OTP, पासवर्ड, UPI PIN या अन्य प्रमाणीकरण जानकारी साझा न करें।",
+    };
+
+    return actions[action] || action;
   }
 
   function formatVerificationStatus(status) {
     const statuses = {
-      requires_verification: "VERIFY INDEPENDENTLY",
-      warning: "REVIEW CAREFULLY",
-      high_priority: "HIGH PRIORITY",
+      requires_verification: {
+        en: "VERIFY INDEPENDENTLY",
+        hi: "स्वतंत्र रूप से सत्यापित करें",
+      },
+
+      warning: {
+        en: "REVIEW CAREFULLY",
+        hi: "सावधानी से समीक्षा करें",
+      },
+
+      high_priority: {
+        en: "HIGH PRIORITY",
+        hi: "उच्च प्राथमिकता",
+      },
     };
 
-    return statuses[status] || "REVIEW";
+    if (statuses[status]) {
+      return statuses[status][language];
+    }
+
+    return language === "hi"
+      ? "समीक्षा करें"
+      : "REVIEW";
+  }
+
+  // -----------------------------
+  // URL LOCALIZATION
+  // -----------------------------
+  function formatUrlSignalTitle(type, title) {
+    if (language === "en") {
+      return title;
+    }
+
+    const titles = {
+      no_https: "कनेक्शन HTTPS पर नहीं है",
+      ip_address: "URL में IP पता इस्तेमाल हुआ है",
+      shortened_url: "Shortened URL इस्तेमाल हुआ है",
+      unusual_port: "URL में असामान्य पोर्ट है",
+      many_subdomains: "कई subdomains मौजूद हैं",
+      investment_path: "निवेश से संबंधित URL path",
+    };
+
+    return titles[type] || title;
+  }
+
+  // -----------------------------
+  // BEFORE YOU PAY LOCALIZATION
+  // -----------------------------
+  function formatBeforeYouPayTitle(id, title) {
+    if (language === "en") {
+      return title;
+    }
+
+    const titles = {
+      sender: "प्रेषक को सत्यापित करें",
+      authority: "प्राधिकरण के दावे को सत्यापित करें",
+      returns: "गारंटीड रिटर्न के दावे पर सवाल करें",
+      payment: "भुगतान करने से पहले रुकें",
+      credentials: "अपनी प्रमाणीकरण जानकारी सुरक्षित रखें",
+      urgency: "जल्दबाजी को निर्णय पर हावी न होने दें",
+      independent: "स्वतंत्र रूप से सत्यापित करें",
+    };
+
+    return titles[id] || title;
+  }
+
+  function formatBeforeYouPayAction(id, action) {
+    if (language === "en") {
+      return action;
+    }
+
+    const actions = {
+      sender:
+        "स्वतंत्र रूप से प्राप्त आधिकारिक स्रोत से पुष्टि करें कि संदेश किसने भेजा है।",
+
+      authority:
+        "संबंधित आधिकारिक वेबसाइट से बताई गई मंजूरी या संबद्धता की जांच करें। संदेश में दिए गए लिंक या स्क्रीनशॉट पर निर्भर न रहें।",
+
+      returns:
+        "गारंटीड या जोखिम-मुक्त भाषा को निवेश की सुरक्षा का प्रमाण न मानें।",
+
+      payment:
+        "पैसे ट्रांसफर करने से पहले प्राप्तकर्ता और भुगतान विवरण की स्वतंत्र रूप से पुष्टि करें।",
+
+      credentials:
+        "OTP, पासवर्ड, UPI PIN या अन्य प्रमाणीकरण जानकारी साझा न करें।",
+
+      urgency:
+        "रुकें और कार्रवाई करने से पहले संदेश को स्वतंत्र रूप से सत्यापित करने के लिए समय लें।",
+
+      independent:
+        "संदेश में दी गई जानकारी पर निर्भर रहने के बजाय स्वतंत्र रूप से प्राप्त आधिकारिक वेबसाइट या संपर्क माध्यम का उपयोग करें।",
+    };
+
+    return actions[id] || action;
+  }
+
+  function formatPriority(priority) {
+    if (priority === "critical") return t.priorityCritical;
+    if (priority === "high") return t.priorityHigh;
+
+    return t.priorityMedium;
+  }
+
+  function formatBeforeYouPayDescription(description) {
+    if (language === "en") {
+      return description;
+    }
+
+    return "पैसे भेजने, क्रेडेंशियल साझा करने या प्रस्ताव पर आगे बढ़ने से पहले इन सुरक्षा जांचों को पूरा करें।";
+  }
+
+  // -----------------------------
+  // SAFETY ACTION LOCALIZATION
+  // -----------------------------
+  function formatSafetyAction(action) {
+    if (language === "en") {
+      return action;
+    }
+
+    const actions = {
+      "Pause before making a payment.":
+        "भुगतान करने से पहले रुकें।",
+
+      "Do not share OTPs, passwords, PINs, or authentication information.":
+        "OTP, पासवर्ड, PIN या प्रमाणीकरण जानकारी साझा न करें।",
+
+      "Independently verify important claims before acting.":
+        "आगे बढ़ने से पहले महत्वपूर्ण दावों को स्वतंत्र रूप से सत्यापित करें।",
+
+      "Verify the sender independently.":
+        "प्रेषक को स्वतंत्र रूप से सत्यापित करें।",
+
+      "Do not rely only on links or contact details provided in the message.":
+        "संदेश में दिए गए लिंक या संपर्क विवरण पर अकेले निर्भर न रहें।",
+    };
+
+    return actions[action] || action;
   }
 
   // -----------------------------
@@ -206,9 +830,13 @@ function App() {
 
     if (!SpeechRecognition) {
       setVoiceSupported(false);
+
       setError(
-        "Voice input is not supported in this browser. Try Chrome or Edge."
+        language === "hi"
+          ? "इस ब्राउज़र में वॉइस इनपुट उपलब्ध नहीं है। Chrome या Edge आज़माएं।"
+          : "Voice input is not supported in this browser. Try Chrome or Edge."
       );
+
       return;
     }
 
@@ -220,15 +848,13 @@ function App() {
 
     const speech = new SpeechRecognition();
 
-    speech.lang = "en-IN";
+    speech.lang =
+      language === "hi"
+        ? "hi-IN"
+        : "en-IN";
 
-    // Keep listening through natural pauses.
     speech.continuous = true;
-
-    // Only add final speech results.
-    // This prevents repeated interim transcripts.
     speech.interimResults = false;
-
     speech.maxAlternatives = 1;
 
     shouldKeepListeningRef.current = true;
@@ -270,10 +896,6 @@ function App() {
         event.error
       );
 
-      /*
-        "no-speech" can happen naturally when the user
-        pauses. We don't show an error for it.
-      */
       if (event.error === "no-speech") {
         return;
       }
@@ -285,7 +907,9 @@ function App() {
         setIsListening(false);
 
         setError(
-          "Microphone permission was denied. Please allow microphone access and try again."
+          language === "hi"
+            ? "माइक्रोफ़ोन की अनुमति नहीं दी गई। माइक्रोफ़ोन की अनुमति दें और फिर प्रयास करें।"
+            : "Microphone permission was denied. Please allow microphone access and try again."
         );
 
         return;
@@ -296,17 +920,13 @@ function App() {
       }
 
       setError(
-        `Voice input failed: ${event.error}`
+        language === "hi"
+          ? `वॉइस इनपुट में समस्या हुई: ${event.error}`
+          : `Voice input failed: ${event.error}`
       );
     };
 
     speech.onend = () => {
-      /*
-        Some browsers automatically end recognition
-        after a pause.
-
-        If the user did NOT press Stop, restart it.
-      */
       if (
         shouldKeepListeningRef.current &&
         recognitionRef.current === speech
@@ -342,18 +962,14 @@ function App() {
       setIsListening(false);
 
       setError(
-        "Could not start voice input. Please try again."
+        language === "hi"
+          ? "वॉइस इनपुट शुरू नहीं हो सका। कृपया फिर प्रयास करें।"
+          : "Could not start voice input. Please try again."
       );
     }
   }
 
   function stopVoiceInput() {
-    /*
-      This flag is important.
-
-      Without it, onend could immediately restart
-      the microphone after the user presses Stop.
-    */
     shouldKeepListeningRef.current = false;
 
     const speech = recognitionRef.current;
@@ -373,8 +989,15 @@ function App() {
     setIsListening(false);
   }
 
+  function changeLanguage(nextLanguage) {
+    if (isListening) {
+      stopVoiceInput();
+    }
+
+    setLanguage(nextLanguage);
+  }
+
   function clearAnalysis() {
-    // Also stop microphone if the user clears the analysis.
     stopVoiceInput();
 
     setMessage("");
@@ -396,15 +1019,35 @@ function App() {
         </a>
 
         <nav>
-          <a href="#home">Home</a>
-          <a href="#analyzer">Analyze message</a>
-          <a href="#safety">Safety tips</a>
+          <a href="#home">{t.home}</a>
+          <a href="#analyzer">{t.analyzeMessage}</a>
+          <a href="#safety">{t.safetyTips}</a>
         </nav>
 
-        <span className="status-badge">
-          <span className="status-dot" />
-          Demo mode
-        </span>
+        <div className="navbar-actions">
+          <div className="language-switcher">
+            <button
+              type="button"
+              className={language === "en" ? "active" : ""}
+              onClick={() => changeLanguage("en")}
+            >
+              EN
+            </button>
+
+            <button
+              type="button"
+              className={language === "hi" ? "active" : ""}
+              onClick={() => changeLanguage("hi")}
+            >
+              हिंदी
+            </button>
+          </div>
+
+          <span className="status-badge">
+            <span className="status-dot" />
+            {t.demoMode}
+          </span>
+        </div>
       </header>
 
       <main id="home">
@@ -412,22 +1055,21 @@ function App() {
         <section className="hero">
           <div className="hero-copy">
             <div className="eyebrow">
-              <span>✳</span> YOUR DIGITAL INVESTMENT GUARDIAN
+              <span>✳</span> {t.digitalGuardian}
             </div>
 
             <h1>
-              Invest with confidence.
+              {t.heroTitle}
               <br />
-              <span>Stay one step ahead.</span>
+              <span>{t.heroTitleAccent}</span>
             </h1>
 
             <p className="hero-description">
-              Spot suspicious investment messages before they put your money
-              at risk. Understand warning signs and make informed decisions.
+              {t.heroDescription}
             </p>
 
             <a className="primary-button" href="#analyzer">
-              Analyze a message <span>↗</span>
+              {t.analyzeButton} <span>↗</span>
             </a>
 
             <div className="trust-note">
@@ -496,13 +1138,14 @@ function App() {
         {/* ANALYZER */}
         <section className="analyzer-section" id="analyzer">
           <div className="section-heading">
-            <div className="eyebrow">MESSAGE ANALYZER</div>
+            <div className="eyebrow">
+              {t.messageAnalyzer}
+            </div>
 
-            <h2>Think it might be a scam?</h2>
+            <h2>{t.analyzerTitle}</h2>
 
             <p>
-              Paste the investment message or upload a screenshot to check for
-              potential red flags.
+              {t.analyzerDescription}
             </p>
           </div>
 
@@ -522,7 +1165,7 @@ function App() {
             {/* IMAGE UPLOAD */}
             <div className="image-upload">
               <label htmlFor="image-upload">
-                Screenshot or image
+                {t.screenshot}
               </label>
 
               <input
@@ -538,7 +1181,7 @@ function App() {
 
               {file && (
                 <small>
-                  Selected: {file.name}
+                  {t.selected} {file.name}
                 </small>
               )}
 
@@ -549,8 +1192,8 @@ function App() {
                 disabled={!file || loading}
               >
                 {loading
-                  ? "Analyzing image..."
-                  : "Analyze screenshot"}
+                  ? t.analyzingImage
+                  : t.analyzeScreenshot}
 
                 <span>→</span>
               </button>
@@ -559,7 +1202,7 @@ function App() {
             {/* ERROR */}
             {error && (
               <div className="error-message" role="alert">
-                <strong>Analysis failed</strong>
+                <strong>{t.checkAnalysisFailed}</strong>
                 <p>{error}</p>
               </div>
             )}
@@ -567,14 +1210,14 @@ function App() {
             {/* TEXT ANALYSIS */}
             <form onSubmit={analyzeMessage}>
               <label htmlFor="message">
-                Message or investment offer
+                {t.messageOffer}
               </label>
 
               <textarea
                 id="message"
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
-                placeholder="Paste a WhatsApp message, SMS, email, or investment offer here..."
+                placeholder={t.messagePlaceholder}
                 rows={5}
               />
 
@@ -598,8 +1241,8 @@ function App() {
                   </span>
 
                   {isListening
-                    ? "Stop Listening"
-                    : "Speak message"}
+                    ? t.stopListening
+                    : t.speakMessage}
                 </button>
               </div>
 
@@ -609,8 +1252,8 @@ function App() {
                 disabled={loading}
               >
                 {loading
-                  ? "Analyzing message..."
-                  : "Analyze for warning signs"}
+                  ? t.analyzingMessage
+                  : t.analyzeWarning}
 
                 <span>→</span>
               </button>
@@ -622,29 +1265,33 @@ function App() {
                 <div className="results-heading">
                   <div>
                     <div className="eyebrow">
-                      ANALYSIS RESULTS
+                      {t.analysisResults}
                     </div>
 
-                    <h3>What we found</h3>
+                    <h3>{t.whatFound}</h3>
                   </div>
 
                   <span
-                    className={`risk-badge ${result.risk
-                      .toLowerCase()
-                      .replace(" ", "-")}`}
+                    className={`risk-badge ${getRiskClass(
+                      result.riskLevel
+                    )}`}
                   >
-                    {result.risk}
+                    {formatRisk(result.riskLevel)}
                   </span>
                 </div>
 
                 <p className="result-summary">
-                  {result.summary}
+                  {formatSummary(
+                    result.summary,
+                    result.riskLevel,
+                    result.signalCount
+                  )}
                 </p>
 
                 {/* OCR TEXT */}
                 {result.extractedText && (
                   <div className="extracted-text">
-                    <strong>Text detected from image</strong>
+                    <strong>{t.extractedText}</strong>
 
                     <p>{result.extractedText}</p>
                   </div>
@@ -656,23 +1303,23 @@ function App() {
                     {result.signals.map((signal, index) => (
                       <div
                         className="signal"
-                        key={`${signal.title}-${index}`}
+                        key={`${signal.type}-${index}`}
                       >
                         <span className="signal-icon">!</span>
 
                         <div>
-                          <strong>{signal.title}</strong>
+                          <strong>
+                            {formatSignalTitle(signal.type)}
+                          </strong>
 
-                          <p>{signal.description}</p>
+                          <p>{signal.evidence}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="no-signals">
-                    No matching warning patterns found by the current
-                    analysis rules. Do not treat this as proof that the
-                    message is legitimate.
+                    {t.noSignals}
                   </div>
                 )}
 
@@ -682,32 +1329,46 @@ function App() {
                     <div className="investigation-header">
                       <div>
                         <div className="eyebrow">
-                          INVESTIGATION REPORT
+                          {t.investigationReport}
                         </div>
 
-                        <h3>Why this deserves attention</h3>
+                        <h3>{t.investigationTitle}</h3>
                       </div>
 
                       <span className="investigation-badge">
-                        Explainable analysis
+                        {t.explainableAnalysis}
                       </span>
                     </div>
 
                     <p className="investigation-summary">
-                      {result.investigation.summary}
+                      {result.investigation.summary
+                        ? language === "en"
+                          ? result.investigation.summary
+                          : result.signalCount === 0
+                          ? t.investigationNoSignals
+                          : `${result.signalCount} ${t.investigationSignals}`
+                        : formatSummary(
+                            result.summary,
+                            result.riskLevel,
+                            result.signalCount
+                          )}
                     </p>
 
                     {/* CLAIMS */}
                     {result.investigation.claims?.length > 0 && (
                       <div className="investigation-block">
                         <div className="investigation-block-title">
-                          <span className="investigation-icon">C</span>
+                          <span className="investigation-icon">
+                            C
+                          </span>
 
                           <div>
-                            <strong>Claims detected</strong>
+                            <strong>
+                              {t.claimsDetected}
+                            </strong>
 
                             <small>
-                              Claims are not treated as verified facts.
+                              {t.claimsDescription}
                             </small>
                           </div>
                         </div>
@@ -719,13 +1380,14 @@ function App() {
                                 className="claim-card"
                                 key={`${claim.claim}-${index}`}
                               >
-                                <strong>{claim.claim}</strong>
+                                <strong>
+                                  {formatClaim(claim.claim)}
+                                </strong>
 
                                 <span>
-                                  {claim.status ===
-                                  "requires_verification"
-                                    ? "Requires independent verification"
-                                    : "Warning claim"}
+                                  {formatClaimStatus(
+                                    claim.status
+                                  )}
                                 </span>
                               </div>
                             )
@@ -738,14 +1400,17 @@ function App() {
                     {result.investigation.evidence?.length > 0 && (
                       <div className="investigation-block">
                         <div className="investigation-block-title">
-                          <span className="investigation-icon">E</span>
+                          <span className="investigation-icon">
+                            E
+                          </span>
 
                           <div>
-                            <strong>Evidence from the message</strong>
+                            <strong>
+                              {t.evidenceMessage}
+                            </strong>
 
                             <small>
-                              These are the specific phrases that triggered
-                              attention.
+                              {t.evidenceDescription}
                             </small>
                           </div>
                         </div>
@@ -761,7 +1426,11 @@ function App() {
                                   “{item.text}”
                                 </div>
 
-                                <p>{item.reason}</p>
+                                <p>
+                                  {formatEvidenceReason(
+                                    item.reason
+                                  )}
+                                </p>
                               </div>
                             )
                           )}
@@ -775,15 +1444,15 @@ function App() {
                         <div className="verification-center-header">
                           <div>
                             <div className="eyebrow">
-                              VERIFICATION CENTER
+                              {t.verificationCenter}
                             </div>
 
-                            <h3>Check these points before you act</h3>
+                            <h3>
+                              {t.verificationTitle}
+                            </h3>
 
                             <p>
-                              These are claims or behaviors that deserve
-                              independent verification. NiveshRakshak does not
-                              treat them as verified facts.
+                              {t.verificationDescription}
                             </p>
                           </div>
 
@@ -791,8 +1460,8 @@ function App() {
                             {result.investigation.verification_items.length}{" "}
                             {result.investigation.verification_items.length ===
                             1
-                              ? "check"
-                              : "checks"}
+                              ? t.verificationCountOne
+                              : t.verificationCountMany}
                           </span>
                         </div>
 
@@ -815,7 +1484,11 @@ function App() {
                                       )}
                                     </span>
 
-                                    <h4>{item.claim}</h4>
+                                    <h4>
+                                      {formatVerificationClaim(
+                                        item.claim
+                                      )}
+                                    </h4>
                                   </div>
                                 </div>
 
@@ -823,9 +1496,15 @@ function App() {
                                   <span>?</span>
 
                                   <div>
-                                    <strong>What should I check?</strong>
+                                    <strong>
+                                      {t.verificationQuestion}
+                                    </strong>
 
-                                    <p>{item.question}</p>
+                                    <p>
+                                      {formatVerificationQuestion(
+                                        item.question
+                                      )}
+                                    </p>
                                   </div>
                                 </div>
 
@@ -833,16 +1512,24 @@ function App() {
                                   <span>✓</span>
 
                                   <div>
-                                    <strong>Safe next step</strong>
+                                    <strong>
+                                      {t.safeNextStep}
+                                    </strong>
 
-                                    <p>{item.action}</p>
+                                    <p>
+                                      {formatVerificationAction(
+                                        item.action
+                                      )}
+                                    </p>
                                   </div>
                                 </div>
 
                                 <span
                                   className={`verification-status ${item.status}`}
                                 >
-                                  {formatVerificationStatus(item.status)}
+                                  {formatVerificationStatus(
+                                    item.status
+                                  )}
                                 </span>
                               </div>
                             )
@@ -850,10 +1537,8 @@ function App() {
                         </div>
 
                         <div className="verification-disclaimer">
-                          <strong>Important:</strong> A detected claim is not
-                          the same as a verified fact. Always use independently
-                          accessed trusted sources before making financial
-                          decisions.
+                          <strong>{t.important}</strong>{" "}
+                          {t.detectedClaimNotVerified}
                         </div>
                       </div>
                     )}
@@ -866,88 +1551,108 @@ function App() {
                     <div className="url-intelligence-header">
                       <div>
                         <span className="section-kicker">
-                          LINK ANALYSIS
+                          {t.linkAnalysis}
                         </span>
 
-                        <h3>URL Intelligence</h3>
+                        <h3>
+                          {t.urlIntelligence}
+                        </h3>
 
                         <p>
-                          The link contains characteristics that may deserve
-                          additional verification.
+                          {t.urlDescription}
                         </p>
                       </div>
 
                       <span className="url-count">
-                        {result.urlAnalysis.urls.length}
+                        {result.urlAnalysis.urls.length}{" "}
                         {result.urlAnalysis.urls.length === 1
-                          ? " link"
-                          : " links"}
+                          ? t.urlCountOne
+                          : t.urlCountMany}
                       </span>
                     </div>
 
                     <div className="url-list">
-                      {result.urlAnalysis.urls.map((urlInfo, index) => (
-                        <div
-                          className="url-card"
-                          key={`${urlInfo.url}-${index}`}
-                        >
-                          <div className="url-card-top">
-                            <span className="url-number">
-                              {String(index + 1).padStart(2, "0")}
-                            </span>
+                      {result.urlAnalysis.urls.map(
+                        (urlInfo, index) => (
+                          <div
+                            className="url-card"
+                            key={`${urlInfo.url}-${index}`}
+                          >
+                            <div className="url-card-top">
+                              <span className="url-number">
+                                {String(index + 1).padStart(2, "0")}
+                              </span>
 
-                            <div className="url-details">
-                              <strong>{urlInfo.hostname}</strong>
+                              <div className="url-details">
+                                <strong>
+                                  {urlInfo.hostname}
+                                </strong>
 
-                              <small>{urlInfo.url}</small>
+                                <small>
+                                  {urlInfo.url}
+                                </small>
+                              </div>
                             </div>
-                          </div>
 
-                          {urlInfo.signals?.length > 0 ? (
-                            <div className="url-signals">
-                              {urlInfo.signals.map(
-                                (signal, signalIndex) => (
-                                  <div
-                                    className="url-signal"
-                                    key={`${signal.type}-${signalIndex}`}
-                                  >
-                                    <span className="url-signal-icon">
-                                      !
-                                    </span>
-
-                                    <div>
-                                      <strong>
-                                        {signal.title}
-                                      </strong>
-
-                                      <p>
-                                        Evidence: {signal.evidence}
-                                      </p>
-                                    </div>
-
-                                    <span
-                                      className={`url-severity ${signal.severity}`}
+                            {urlInfo.signals?.length > 0 ? (
+                              <div className="url-signals">
+                                {urlInfo.signals.map(
+                                  (
+                                    signal,
+                                    signalIndex
+                                  ) => (
+                                    <div
+                                      className="url-signal"
+                                      key={`${signal.type}-${signalIndex}`}
                                     >
-                                      {signal.severity.toUpperCase()}
-                                    </span>
-                                  </div>
-                                )
-                              )}
-                            </div>
-                          ) : (
-                            <div className="url-no-signals">
-                              No predefined URL characteristics were detected.
-                              This does not establish that the link is safe.
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                                      <span className="url-signal-icon">
+                                        !
+                                      </span>
+
+                                      <div>
+                                        <strong>
+                                          {formatUrlSignalTitle(
+                                            signal.type,
+                                            signal.title
+                                          )}
+                                        </strong>
+
+                                        <p>
+                                          {t.urlEvidence}{" "}
+                                          {signal.evidence}
+                                        </p>
+                                      </div>
+
+                                      <span
+                                        className={`url-severity ${signal.severity}`}
+                                      >
+                                        {language === "hi"
+                                          ? signal.severity ===
+                                            "high"
+                                            ? "उच्च"
+                                            : signal.severity ===
+                                              "medium"
+                                            ? "मध्यम"
+                                            : "कम"
+                                          : signal.severity.toUpperCase()}
+                                      </span>
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            ) : (
+                              <div className="url-no-signals">
+                                {t.urlNoSignals}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      )}
                     </div>
 
                     <div className="url-disclaimer">
-                      <strong>Important:</strong>{" "}
-                      URL characteristics are signals for review, not proof
-                      that a website is fraudulent or legitimate.
+                      <strong>{t.important}</strong>{" "}
+                      {t.urlDisclaimer}
                     </div>
                   </section>
                 )}
@@ -958,15 +1663,17 @@ function App() {
                     <div className="before-you-pay-header">
                       <div>
                         <span className="section-kicker">
-                          SAFETY CHECK
+                          {t.safetyCheck}
                         </span>
 
                         <h3>
-                          {result.beforeYouPay.title}
+                          {t.beforeYouPay}
                         </h3>
 
                         <p>
-                          {result.beforeYouPay.description}
+                          {formatBeforeYouPayDescription(
+                            result.beforeYouPay.description
+                          )}
                         </p>
                       </div>
 
@@ -989,7 +1696,10 @@ function App() {
                             <div className="before-you-pay-content">
                               <div className="before-you-pay-item-top">
                                 <h4>
-                                  {check.title}
+                                  {formatBeforeYouPayTitle(
+                                    check.id,
+                                    check.title
+                                  )}
                                 </h4>
 
                                 <span
@@ -997,14 +1707,17 @@ function App() {
                                     check.priority || "medium"
                                   }`}
                                 >
-                                  {String(
-                                    check.priority || "medium"
-                                  ).toUpperCase()}
+                                  {formatPriority(
+                                    check.priority
+                                  )}
                                 </span>
                               </div>
 
                               <p>
-                                {check.action}
+                                {formatBeforeYouPayAction(
+                                  check.id,
+                                  check.action
+                                )}
                               </p>
                             </div>
                           </div>
@@ -1014,8 +1727,10 @@ function App() {
 
                     {result.beforeYouPay.disclaimer && (
                       <div className="before-you-pay-disclaimer">
-                        <strong>Important:</strong>{" "}
-                        {result.beforeYouPay.disclaimer}
+                        <strong>{t.important}</strong>{" "}
+                        {language === "hi"
+                          ? t.beforeYouPayDisclaimer
+                          : result.beforeYouPay.disclaimer}
                       </div>
                     )}
                   </section>
@@ -1026,14 +1741,16 @@ function App() {
                   result.safetyActions.length > 0 && (
                     <div className="safety-callout">
                       <strong>
-                        Recommended safety steps
+                        {t.recommendedSafety}
                       </strong>
 
                       <ul>
                         {result.safetyActions.map(
                           (action, index) => (
-                            <li key={`${action}-${index}`}>
-                              {action}
+                            <li
+                              key={`${action}-${index}`}
+                            >
+                              {formatSafetyAction(action)}
                             </li>
                           )
                         )}
@@ -1046,16 +1763,13 @@ function App() {
                   type="button"
                   onClick={clearAnalysis}
                 >
-                  Clear and analyze another message
+                  {t.clearAnalysis}
                 </button>
               </div>
             )}
 
             <p className="disclaimer">
-              This is an educational demo. Results are intended to highlight
-              potential warning signals and should not be treated as proof that
-              a message is fraudulent or legitimate. Always verify important
-              claims independently.
+              {t.disclaimer}
             </p>
           </div>
         </section>
@@ -1064,47 +1778,37 @@ function App() {
         <section className="safety-section" id="safety">
           <div className="section-heading">
             <div className="eyebrow">
-              INVESTOR AWARENESS
+              {t.investorAwareness}
             </div>
 
-            <h2>Pause. Check. Then decide.</h2>
+            <h2>{t.safetyTitle}</h2>
 
-            <p>
-              Keep these simple precautions in mind when evaluating an offer.
-            </p>
+            <p>{t.safetyDescription}</p>
           </div>
 
           <div className="tips-grid">
             <article className="tip-card">
               <span>01</span>
 
-              <h3>Question guaranteed returns</h3>
+              <h3>{t.tip1Title}</h3>
 
-              <p>
-                Be cautious of promises of unusually high or risk-free
-                profits.
-              </p>
+              <p>{t.tip1Description}</p>
             </article>
 
             <article className="tip-card">
               <span>02</span>
 
-              <h3>Verify independently</h3>
+              <h3>{t.tip2Title}</h3>
 
-              <p>
-                Check the organization using official sources, not just links
-                in a message.
-              </p>
+              <p>{t.tip2Description}</p>
             </article>
 
             <article className="tip-card">
               <span>03</span>
 
-              <h3>Never share secret credentials</h3>
+              <h3>{t.tip3Title}</h3>
 
-              <p>
-                Keep your OTP, password, and UPI PIN private.
-              </p>
+              <p>{t.tip3Description}</p>
             </article>
           </div>
         </section>
@@ -1120,9 +1824,7 @@ function App() {
           </span>
         </a>
 
-        <p>
-          Built for investor awareness and digital safety.
-        </p>
+        <p>{t.footerDescription}</p>
 
         <span>
           © 2026 NiveshRakshak · Hackathon demo
