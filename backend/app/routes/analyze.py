@@ -10,13 +10,25 @@ from backend.app.services.verification import build_verification_items
 from backend.app.services.ocr import extract_text_from_image
 from backend.app.services.safety import build_before_you_pay
 from backend.app.services.url_analysis import analyze_urls
+from backend.app.services.conversation import analyze_conversation
 
 
-router = APIRouter(prefix="/api", tags=["Analysis"])
+router = APIRouter(
+    prefix="/api",
+    tags=["Analysis"],
+)
 
 
 class AnalyzeRequest(BaseModel):
     text: str
+
+
+class ConversationMessage(BaseModel):
+    text: str
+
+
+class ConversationAnalyzeRequest(BaseModel):
+    messages: list[ConversationMessage]
 
 
 def add_signal(
@@ -25,9 +37,6 @@ def add_signal(
     severity: str,
     evidence: str,
 ):
-    """
-    Add a signal only once.
-    """
     if any(
         signal["type"] == signal_type
         for signal in signals
@@ -51,18 +60,9 @@ def contains_any(
     )
 
 
-def has_guaranteed_return_pattern(text: str) -> bool:
-    """
-    Detect guaranteed/fixed/risk-free financial return language
-    even when a percentage or number appears between the words.
-
-    Examples:
-    - guaranteed 25% monthly returns
-    - guaranteed 30 percent returns
-    - guaranteed monthly profit
-    - fixed 20% return
-    - risk-free 15% profit
-    """
+def has_guaranteed_return_pattern(
+    text: str,
+) -> bool:
 
     patterns = [
         r"\bguaranteed\b.{0,40}\b(return|returns|profit|profits|income|earnings)\b",
@@ -91,18 +91,12 @@ def merge_verification_items(
     ai_items: list,
     rule_items: list,
 ) -> list:
-    """
-    Combine AI and deterministic verification guidance.
-
-    Deterministic safety guidance gets priority.
-    AI provides additional contextual categories.
-    """
 
     merged = []
     seen_categories = set()
 
-    # Deterministic safety guidance first.
     for item in rule_items:
+
         if not isinstance(item, dict):
             continue
 
@@ -119,8 +113,8 @@ def merge_verification_items(
         seen_categories.add(category)
         merged.append(item)
 
-    # Add genuinely new AI categories.
     for item in ai_items:
+
         if not isinstance(item, dict):
             continue
 
@@ -141,11 +135,12 @@ def merge_verification_items(
 
 
 def analyze_text(text: str):
+
     signals = []
     lower_text = text.lower()
 
     # ---------------------------------------------------------
-    # 1. GUARANTEED RETURN / NO-RISK CLAIMS
+    # 1. GUARANTEED RETURN
     # ---------------------------------------------------------
 
     guaranteed_phrases = [
@@ -192,7 +187,7 @@ def analyze_text(text: str):
         )
 
     # ---------------------------------------------------------
-    # 2. URGENCY / PRESSURE
+    # 2. URGENCY
     # ---------------------------------------------------------
 
     urgency_phrases = [
@@ -234,7 +229,7 @@ def analyze_text(text: str):
         )
 
     # ---------------------------------------------------------
-    # 3. PAYMENT / MONEY TRANSFER REQUEST
+    # 3. PAYMENT
     # ---------------------------------------------------------
 
     payment_phrases = [
@@ -321,7 +316,7 @@ def analyze_text(text: str):
         )
 
     # ---------------------------------------------------------
-    # 5. AUTHORITY / APPROVAL CLAIMS
+    # 5. AUTHORITY
     # ---------------------------------------------------------
 
     authority_phrases = [
@@ -365,7 +360,7 @@ def analyze_text(text: str):
         )
 
     # ---------------------------------------------------------
-    # 6. OVERALL RULE-BASED RISK
+    # 6. RISK
     # ---------------------------------------------------------
 
     if any(
@@ -384,7 +379,7 @@ def analyze_text(text: str):
         risk_level = "low"
 
     # ---------------------------------------------------------
-    # 7. RULE-BASED SUMMARY
+    # 7. SUMMARY
     # ---------------------------------------------------------
 
     if len(signals) >= 3:
@@ -452,7 +447,7 @@ def analyze_text(text: str):
         )
 
     # ---------------------------------------------------------
-    # 9. GEMINI INVESTIGATION
+    # 9. AI INVESTIGATION
     # ---------------------------------------------------------
 
     investigation = build_investigation(
@@ -466,7 +461,7 @@ def analyze_text(text: str):
     )
 
     # ---------------------------------------------------------
-    # 10. DETERMINISTIC VERIFICATION
+    # 10. VERIFICATION
     # ---------------------------------------------------------
 
     rule_verification_items = build_verification_items(
@@ -476,10 +471,6 @@ def analyze_text(text: str):
             [],
         ),
     )
-
-    # ---------------------------------------------------------
-    # 11. AI + RULE VERIFICATION FUSION
-    # ---------------------------------------------------------
 
     ai_verification_items = investigation_data.get(
         "verification_items",
@@ -498,7 +489,7 @@ def analyze_text(text: str):
     investigation["investigation"] = investigation_data
 
     # ---------------------------------------------------------
-    # 12. BEFORE YOU PAY
+    # 11. BEFORE YOU PAY
     # ---------------------------------------------------------
 
     before_you_pay = build_before_you_pay(
@@ -508,13 +499,13 @@ def analyze_text(text: str):
     )
 
     # ---------------------------------------------------------
-    # 13. URL ANALYSIS
+    # 12. URL ANALYSIS
     # ---------------------------------------------------------
 
     url_analysis = analyze_urls(text)
 
     # ---------------------------------------------------------
-    # 14. FINAL RESPONSE
+    # 13. FINAL RESPONSE
     # ---------------------------------------------------------
 
     result = {
@@ -532,16 +523,20 @@ def analyze_text(text: str):
 
 
 # -------------------------------------------------------------
-# TEXT ANALYSIS ENDPOINT
+# TEXT ANALYSIS
 # -------------------------------------------------------------
 
 @router.post("/analyze")
-def analyze_message(request: AnalyzeRequest):
-    return analyze_text(request.text)
+def analyze_message(
+    request: AnalyzeRequest,
+):
+    return analyze_text(
+        request.text
+    )
 
 
 # -------------------------------------------------------------
-# IMAGE ANALYSIS ENDPOINT
+# IMAGE ANALYSIS
 # -------------------------------------------------------------
 
 @router.post("/analyze-image")
@@ -568,13 +563,18 @@ async def analyze_image(
     temp_path = None
 
     try:
+
         with NamedTemporaryFile(
             delete=False,
             suffix=suffix,
         ) as temp_file:
 
             content = await file.read()
-            temp_file.write(content)
+
+            temp_file.write(
+                content
+            )
+
             temp_path = temp_file.name
 
         extracted_text = extract_text_from_image(
@@ -592,7 +592,58 @@ async def analyze_image(
         }
 
     finally:
+
         if temp_path:
-            Path(temp_path).unlink(
+            Path(
+                temp_path
+            ).unlink(
                 missing_ok=True
             )
+
+
+# -------------------------------------------------------------
+# CONVERSATION ANALYSIS
+# -------------------------------------------------------------
+
+@router.post("/conversation/analyze")
+def analyze_conversation_endpoint(
+    request: ConversationAnalyzeRequest,
+):
+
+    if not request.messages:
+        raise HTTPException(
+            status_code=400,
+            detail="At least one conversation message is required.",
+        )
+
+    if len(request.messages) > 20:
+        raise HTTPException(
+            status_code=400,
+            detail="A maximum of 20 conversation messages is supported.",
+        )
+
+    analyzed_messages = []
+
+    for message in request.messages:
+
+        text = message.text.strip()
+
+        if not text:
+            continue
+
+        analyzed_messages.append({
+            "text": text,
+            "analysis": analyze_text(
+                text
+            ),
+        })
+
+    if not analyzed_messages:
+        raise HTTPException(
+            status_code=400,
+            detail="Conversation messages cannot be empty.",
+        )
+
+    return analyze_conversation(
+        analyzed_messages
+    )

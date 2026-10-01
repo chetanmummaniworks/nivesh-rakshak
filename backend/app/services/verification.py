@@ -10,9 +10,6 @@ def build_verification_items(text: str, claims: list) -> list:
     lower_text = text.lower()
     verification_items = []
 
-    # -----------------------------------------
-    # Regulatory / authority claims
-    # -----------------------------------------
     if "sebi approved" in lower_text:
         verification_items.append({
             "category": "regulatory_approval",
@@ -40,20 +37,21 @@ def build_verification_items(text: str, claims: list) -> list:
             "status": "requires_verification",
         })
 
-    # -----------------------------------------
-    # Guaranteed returns
-    # -----------------------------------------
     guaranteed_phrases = [
         "guaranteed return",
         "guaranteed returns",
         "guaranteed profit",
+        "guaranteed profits",
         "no risk",
         "risk free",
         "risk-free",
         "100% safe",
     ]
 
-    if any(phrase in lower_text for phrase in guaranteed_phrases):
+    if any(
+        phrase in lower_text
+        for phrase in guaranteed_phrases
+    ):
         verification_items.append({
             "category": "return_claim",
             "claim": "A guaranteed or risk-free return is being claimed",
@@ -65,9 +63,6 @@ def build_verification_items(text: str, claims: list) -> list:
             "status": "warning",
         })
 
-    # -----------------------------------------
-    # Advisor / registration claims
-    # -----------------------------------------
     if (
         "registered advisor" in lower_text
         or "registered adviser" in lower_text
@@ -85,9 +80,6 @@ def build_verification_items(text: str, claims: list) -> list:
             "status": "requires_verification",
         })
 
-    # -----------------------------------------
-    # Urgency
-    # -----------------------------------------
     urgency_phrases = [
         "invest today",
         "act now",
@@ -98,7 +90,10 @@ def build_verification_items(text: str, claims: list) -> list:
         "only this week",
     ]
 
-    if any(phrase in lower_text for phrase in urgency_phrases):
+    if any(
+        phrase in lower_text
+        for phrase in urgency_phrases
+    ):
         verification_items.append({
             "category": "urgency",
             "claim": "The message creates pressure to act quickly",
@@ -110,9 +105,6 @@ def build_verification_items(text: str, claims: list) -> list:
             "status": "warning",
         })
 
-    # -----------------------------------------
-    # Sensitive information
-    # -----------------------------------------
     sensitive_phrases = [
         "share otp",
         "send otp",
@@ -123,7 +115,10 @@ def build_verification_items(text: str, claims: list) -> list:
         "send pin",
     ]
 
-    if any(phrase in lower_text for phrase in sensitive_phrases):
+    if any(
+        phrase in lower_text
+        for phrase in sensitive_phrases
+    ):
         verification_items.append({
             "category": "sensitive_information",
             "claim": "The message requests sensitive authentication information",

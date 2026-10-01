@@ -144,6 +144,53 @@ const translations = {
 
     disclaimer:
       "This is an educational demo. Results are intended to highlight potential warning signals and should not be treated as proof that a message is fraudulent or legitimate. Always verify important claims independently.",
+
+    singleMessageMode: "Single message",
+    conversationMode: "Conversation",
+
+    conversationTitle: "Analyze a conversation",
+    conversationDescription:
+      "Review how warning signals develop across multiple messages instead of looking at each message in isolation.",
+
+    conversationPlaceholder:
+      "Paste a message from the conversation...",
+
+    addMessage: "Add message",
+    removeMessage: "Remove",
+    analyzeConversation: "Analyze conversation",
+    analyzingConversation: "Analyzing conversation...",
+
+    conversationResults: "CONVERSATION INTELLIGENCE",
+    conversationOverview: "How the conversation developed",
+    messagesAnalyzed: "messages analyzed",
+    warningStages: "warning stages",
+    escalationDetected: "Escalation pattern detected",
+    noProgression:
+      "No predefined conversation progression was detected. This does not establish that the conversation is safe.",
+
+    messageLabel: "Message",
+    noWarningSignals: "No predefined warning signals",
+
+    authorityClaim: "Authority claim",
+    guaranteedReturn: "Guaranteed return",
+    urgencyStage: "Urgency or pressure",
+    paymentRequest: "Payment request",
+    sensitiveInformation: "Sensitive information request",
+
+    chronologicalWarning:
+      "The warning stages below are shown in the order they first appeared in the conversation.",
+
+    conversationDisclaimer:
+      "Conversation analysis describes observed warning patterns. It does not establish that a conversation is fraudulent or legitimate.",
+
+    conversationMinMessages:
+      "Add at least one non-empty message before analyzing.",
+
+    conversationEmpty:
+      "No conversation messages were provided.",
+
+    conversationFailed:
+      "Something went wrong while analyzing the conversation.",
   },
 
   hi: {
@@ -284,6 +331,53 @@ const translations = {
 
     disclaimer:
       "यह एक शैक्षणिक डेमो है। परिणाम संभावित चेतावनी संकेतों को दिखाने के लिए हैं और इन्हें संदेश के धोखाधड़ी वाला या वैध होने का प्रमाण नहीं माना जाना चाहिए। महत्वपूर्ण दावों को हमेशा स्वतंत्र रूप से सत्यापित करें।",
+
+    singleMessageMode: "एक संदेश",
+    conversationMode: "बातचीत",
+
+    conversationTitle: "पूरी बातचीत का विश्लेषण करें",
+    conversationDescription:
+      "कई संदेशों में चेतावनी संकेत कैसे बढ़ते हैं, इसे एक साथ समझें।",
+
+    conversationPlaceholder:
+      "बातचीत का एक संदेश यहां पेस्ट करें...",
+
+    addMessage: "संदेश जोड़ें",
+    removeMessage: "हटाएं",
+    analyzeConversation: "बातचीत का विश्लेषण करें",
+    analyzingConversation: "बातचीत का विश्लेषण हो रहा है...",
+
+    conversationResults: "बातचीत सुरक्षा विश्लेषण",
+    conversationOverview: "बातचीत कैसे आगे बढ़ी",
+    messagesAnalyzed: "संदेशों का विश्लेषण",
+    warningStages: "चेतावनी चरण",
+    escalationDetected: "बढ़ता हुआ जोखिम पैटर्न",
+    noProgression:
+      "बातचीत में कोई निर्धारित क्रम नहीं मिला। इसका अर्थ यह नहीं है कि बातचीत सुरक्षित है।",
+
+    messageLabel: "संदेश",
+    noWarningSignals: "कोई निर्धारित चेतावनी संकेत नहीं",
+
+    authorityClaim: "प्राधिकरण का दावा",
+    guaranteedReturn: "गारंटीड रिटर्न",
+    urgencyStage: "जल्दबाजी या दबाव",
+    paymentRequest: "भुगतान का अनुरोध",
+    sensitiveInformation: "संवेदनशील जानकारी का अनुरोध",
+
+    chronologicalWarning:
+      "नीचे चेतावनी चरण उस क्रम में दिखाए गए हैं जिसमें वे पहली बार बातचीत में दिखाई दिए।",
+
+    conversationDisclaimer:
+      "बातचीत विश्लेषण केवल देखे गए चेतावनी पैटर्न बताता है। इससे बातचीत के धोखाधड़ी वाला या वैध होने का प्रमाण नहीं मिलता।",
+
+    conversationMinMessages:
+      "विश्लेषण करने से पहले कम से कम एक संदेश जोड़ें।",
+
+    conversationEmpty:
+      "बातचीत में कोई संदेश नहीं दिया गया।",
+
+    conversationFailed:
+      "बातचीत का विश्लेषण करते समय समस्या हुई।",
   },
 };
 
@@ -292,6 +386,20 @@ function App() {
 
   const [message, setMessage] = useState("");
   const [result, setResult] = useState(null);
+
+  const [analysisMode, setAnalysisMode] = useState("single");
+
+  const [conversationMessages, setConversationMessages] =
+    useState([
+      "",
+      "",
+    ]);
+
+  const [conversationResult, setConversationResult] =
+    useState(null);
+
+  const [conversationLoading, setConversationLoading] =
+    useState(false);
 
   const [isListening, setIsListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(true);
@@ -415,6 +523,90 @@ function App() {
   }
 
   // -----------------------------
+  // CONVERSATION ANALYSIS
+  // -----------------------------
+  function updateConversationMessage(index, value) {
+    setConversationMessages((previous) =>
+      previous.map((item, itemIndex) =>
+        itemIndex === index ? value : item
+      )
+    );
+  }
+
+  function addConversationMessage() {
+    setConversationMessages((previous) => [
+      ...previous,
+      "",
+    ]);
+  }
+
+  function removeConversationMessage(index) {
+    setConversationMessages((previous) => {
+      if (previous.length <= 1) {
+        return [""];
+      }
+
+      return previous.filter(
+        (_, itemIndex) => itemIndex !== index
+      );
+    });
+  }
+
+  async function analyzeConversation() {
+    const messages = conversationMessages
+      .map((text) => text.trim())
+      .filter(Boolean);
+
+    if (messages.length === 0) {
+      setError(t.conversationMinMessages);
+      return;
+    }
+
+    setConversationLoading(true);
+    setError("");
+    setConversationResult(null);
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/conversation/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            messages: messages.map((text) => ({
+              text,
+            })),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+
+        throw new Error(
+          errorData?.detail ||
+            t.conversationFailed
+        );
+      }
+
+      const data = await response.json();
+
+      setConversationResult(
+        data.conversation || null
+      );
+    } catch (err) {
+      setError(
+        err.message ||
+          t.conversationFailed
+      );
+    } finally {
+      setConversationLoading(false);
+    }
+  }
+
+  // -----------------------------
   // RISK LOCALIZATION
   // -----------------------------
   function formatRisk(riskLevel) {
@@ -480,6 +672,11 @@ function App() {
         en: "Authority or approval claim",
         hi: "प्राधिकरण या मंजूरी का दावा",
       },
+
+      payment_request: {
+        en: "Payment request",
+        hi: "भुगतान का अनुरोध",
+      },
     };
 
     if (titles[type]) {
@@ -489,6 +686,97 @@ function App() {
     return type
       .replaceAll("_", " ")
       .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  }
+
+  // -----------------------------
+  // CONVERSATION LOCALIZATION
+  // -----------------------------
+  function formatConversationStage(type) {
+    const stages = {
+      authority_claim: {
+        en: t.authorityClaim,
+        hi: t.authorityClaim,
+      },
+
+      guaranteed_return: {
+        en: t.guaranteedReturn,
+        hi: t.guaranteedReturn,
+      },
+
+      urgency: {
+        en: t.urgencyStage,
+        hi: t.urgencyStage,
+      },
+
+      payment_request: {
+        en: t.paymentRequest,
+        hi: t.paymentRequest,
+      },
+
+      sensitive_information: {
+        en: t.sensitiveInformation,
+        hi: t.sensitiveInformation,
+      },
+    };
+
+    return stages[type]?.[language] || formatSignalTitle(type);
+  }
+
+  function formatConversationPattern(pattern) {
+    if (language === "en") {
+      if (pattern === "escalating_action_pressure") {
+        return "Escalating action pressure";
+      }
+
+      if (pattern === "multiple_warning_stages") {
+        return "Multiple warning stages";
+      }
+
+      if (pattern === "single_warning_stage") {
+        return "Single warning stage";
+      }
+
+      return "No known progression";
+    }
+
+    if (pattern === "escalating_action_pressure") {
+      return "बढ़ता हुआ कार्रवाई का दबाव";
+    }
+
+    if (pattern === "multiple_warning_stages") {
+      return "कई चेतावनी चरण";
+    }
+
+    if (pattern === "single_warning_stage") {
+      return "एक चेतावनी चरण";
+    }
+
+    return "कोई निर्धारित क्रम नहीं";
+  }
+
+  function formatConversationStageDescription(stage) {
+    if (language === "en") {
+      return stage.description;
+    }
+
+    const descriptions = {
+      authority_claim:
+        "बातचीत में नियामक, सरकारी या आधिकारिक स्थिति का दावा किया गया है जिसे स्वतंत्र रूप से सत्यापित किया जाना चाहिए।",
+
+      guaranteed_return:
+        "बातचीत में वित्तीय परिणाम को गारंटीड, निश्चित या जोखिम-मुक्त बताया गया है।",
+
+      urgency:
+        "बातचीत में जल्दी कार्रवाई करने के लिए दबाव बनाया गया है।",
+
+      payment_request:
+        "बातचीत में पैसे ट्रांसफर करने या भुगतान करने का अनुरोध किया गया है।",
+
+      sensitive_information:
+        "बातचीत में संवेदनशील प्रमाणीकरण या वित्तीय जानकारी मांगी गई है।",
+    };
+
+    return descriptions[stage.type] || stage.description;
   }
 
   // -----------------------------
@@ -583,6 +871,11 @@ function App() {
         en: "SECURITY",
         hi: "सुरक्षा",
       },
+
+      payment: {
+        en: "PAYMENT",
+        hi: "भुगतान",
+      },
     };
 
     if (categories[category]) {
@@ -617,6 +910,9 @@ function App() {
 
       "The message requests sensitive authentication information":
         "संदेश संवेदनशील प्रमाणीकरण जानकारी मांगता है",
+
+      "The message requests a payment or transfer.":
+        "संदेश भुगतान या धन हस्तांतरण का अनुरोध करता है",
     };
 
     return claims[claim] || claim;
@@ -645,6 +941,9 @@ function App() {
 
       "Is the sender asking for credentials that should remain private?":
         "क्या प्रेषक ऐसी जानकारी मांग रहा है जिसे निजी रखा जाना चाहिए?",
+
+      "Has the recipient and payment destination been independently verified?":
+        "क्या प्राप्तकर्ता और भुगतान गंतव्य को स्वतंत्र रूप से सत्यापित किया गया है?",
     };
 
     return questions[question] || question;
@@ -673,6 +972,9 @@ function App() {
 
       "Do not share OTPs, passwords, UPI PINs, or other authentication information.":
         "OTP, पासवर्ड, UPI PIN या अन्य प्रमाणीकरण जानकारी साझा न करें।",
+
+      "Pause before sending money. Independently verify the recipient and payment details.":
+        "पैसे भेजने से पहले रुकें। प्राप्तकर्ता और भुगतान विवरण को स्वतंत्र रूप से सत्यापित करें।",
     };
 
     return actions[action] || action;
@@ -1006,6 +1308,16 @@ function App() {
     setError("");
   }
 
+  function clearConversation() {
+    setConversationMessages([
+      "",
+      "",
+    ]);
+
+    setConversationResult(null);
+    setError("");
+  }
+
   return (
     <div className="app-shell">
       <header className="navbar">
@@ -1162,275 +1474,619 @@ function App() {
               </span>
             </div>
 
-            {/* IMAGE UPLOAD */}
-            <div className="image-upload">
-              <label htmlFor="image-upload">
-                {t.screenshot}
-              </label>
-
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                onChange={(event) => {
-                  setFile(event.target.files?.[0] || null);
+            {/* ANALYSIS MODE SWITCH */}
+            <div
+              style={{
+                display: "flex",
+                gap: "8px",
+                padding: "6px",
+                marginBottom: "24px",
+                borderRadius: "12px",
+                background: "#f4f6f8",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  setAnalysisMode("single");
                   setError("");
-                  setResult(null);
+                  setConversationResult(null);
                 }}
-              />
-
-              {file && (
-                <small>
-                  {t.selected} {file.name}
-                </small>
-              )}
+                style={{
+                  flex: 1,
+                  border: "none",
+                  borderRadius: "9px",
+                  padding: "12px 16px",
+                  cursor: "pointer",
+                  fontWeight: 700,
+                  background:
+                    analysisMode === "single"
+                      ? "#ffffff"
+                      : "transparent",
+                  boxShadow:
+                    analysisMode === "single"
+                      ? "0 2px 8px rgba(0,0,0,0.08)"
+                      : "none",
+                }}
+              >
+                {t.singleMessageMode}
+              </button>
 
               <button
                 type="button"
-                className="analyze-button"
-                onClick={analyzeImage}
-                disabled={!file || loading}
+                onClick={() => {
+                  setAnalysisMode("conversation");
+                  setError("");
+                  setResult(null);
+                }}
+                style={{
+                  flex: 1,
+                  border: "none",
+                  borderRadius: "9px",
+                  padding: "12px 16px",
+                  cursor: "pointer",
+                  fontWeight: 700,
+                  background:
+                    analysisMode === "conversation"
+                      ? "#ffffff"
+                      : "transparent",
+                  boxShadow:
+                    analysisMode === "conversation"
+                      ? "0 2px 8px rgba(0,0,0,0.08)"
+                      : "none",
+                }}
               >
-                {loading
-                  ? t.analyzingImage
-                  : t.analyzeScreenshot}
-
-                <span>→</span>
+                {t.conversationMode}
               </button>
             </div>
 
-            {/* ERROR */}
-            {error && (
-              <div className="error-message" role="alert">
-                <strong>{t.checkAnalysisFailed}</strong>
-                <p>{error}</p>
-              </div>
-            )}
-
-            {/* TEXT ANALYSIS */}
-            <form onSubmit={analyzeMessage}>
-              <label htmlFor="message">
-                {t.messageOffer}
-              </label>
-
-              <textarea
-                id="message"
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                placeholder={t.messagePlaceholder}
-                rows={5}
-              />
-
-              <div className="input-footer">
-                <span>{message.length} characters</span>
-
-                <button
-                  type="button"
-                  className={`voice-button ${
-                    isListening ? "listening" : ""
-                  }`}
-                  onClick={
-                    isListening
-                      ? stopVoiceInput
-                      : startVoiceInput
-                  }
-                  disabled={!voiceSupported}
+            {/* CONVERSATION MODE */}
+            {analysisMode === "conversation" ? (
+              <div className="conversation-analyzer">
+                <div
+                  style={{
+                    marginBottom: "20px",
+                  }}
                 >
-                  <span>
-                    {isListening ? "■" : "🎙"}
-                  </span>
-
-                  {isListening
-                    ? t.stopListening
-                    : t.speakMessage}
-                </button>
-              </div>
-
-              <button
-                className="analyze-button"
-                type="submit"
-                disabled={loading}
-              >
-                {loading
-                  ? t.analyzingMessage
-                  : t.analyzeWarning}
-
-                <span>→</span>
-              </button>
-            </form>
-
-            {/* RESULTS */}
-            {result && (
-              <div className="results" aria-live="polite">
-                <div className="results-heading">
-                  <div>
-                    <div className="eyebrow">
-                      {t.analysisResults}
-                    </div>
-
-                    <h3>{t.whatFound}</h3>
+                  <div className="eyebrow">
+                    {t.conversationResults}
                   </div>
 
-                  <span
-                    className={`risk-badge ${getRiskClass(
-                      result.riskLevel
-                    )}`}
+                  <h3
+                    style={{
+                      margin: "6px 0 8px",
+                    }}
                   >
-                    {formatRisk(result.riskLevel)}
-                  </span>
+                    {t.conversationTitle}
+                  </h3>
+
+                  <p
+                    style={{
+                      margin: 0,
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {t.conversationDescription}
+                  </p>
                 </div>
 
-                <p className="result-summary">
-                  {formatSummary(
-                    result.summary,
-                    result.riskLevel,
-                    result.signalCount
-                  )}
-                </p>
-
-                {/* OCR TEXT */}
-                {result.extractedText && (
-                  <div className="extracted-text">
-                    <strong>{t.extractedText}</strong>
-
-                    <p>{result.extractedText}</p>
-                  </div>
-                )}
-
-                {/* WARNING SIGNALS */}
-                {result.signals.length > 0 ? (
-                  <div className="signals-list">
-                    {result.signals.map((signal, index) => (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "14px",
+                  }}
+                >
+                  {conversationMessages.map(
+                    (conversationMessage, index) => (
                       <div
-                        className="signal"
-                        key={`${signal.type}-${index}`}
+                        key={index}
+                        style={{
+                          border: "1px solid #e3e7eb",
+                          borderRadius: "14px",
+                          padding: "14px",
+                          background: "#fafbfc",
+                        }}
                       >
-                        <span className="signal-icon">!</span>
-
-                        <div>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: "12px",
+                            marginBottom: "10px",
+                          }}
+                        >
                           <strong>
-                            {formatSignalTitle(signal.type)}
+                            {t.messageLabel} {index + 1}
                           </strong>
 
-                          <p>{signal.evidence}</p>
+                          {conversationMessages.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removeConversationMessage(index)
+                              }
+                              style={{
+                                border: "none",
+                                background: "transparent",
+                                cursor: "pointer",
+                                fontWeight: 700,
+                                opacity: 0.65,
+                              }}
+                            >
+                              {t.removeMessage}
+                            </button>
+                          )}
                         </div>
+
+                        <textarea
+                          value={conversationMessage}
+                          onChange={(event) =>
+                            updateConversationMessage(
+                              index,
+                              event.target.value
+                            )
+                          }
+                          placeholder={t.conversationPlaceholder}
+                          rows={3}
+                          style={{
+                            width: "100%",
+                            boxSizing: "border-box",
+                            resize: "vertical",
+                          }}
+                        />
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="no-signals">
-                    {t.noSignals}
+                    )
+                  )}
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    marginTop: "16px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="text-button"
+                    onClick={addConversationMessage}
+                    disabled={
+                      conversationMessages.length >= 20
+                    }
+                  >
+                    + {t.addMessage}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="analyze-button"
+                    onClick={analyzeConversation}
+                    disabled={conversationLoading}
+                  >
+                    {conversationLoading
+                      ? t.analyzingConversation
+                      : t.analyzeConversation}
+
+                    <span>→</span>
+                  </button>
+                </div>
+
+                {/* CONVERSATION ERROR */}
+                {error && (
+                  <div
+                    className="error-message"
+                    role="alert"
+                    style={{
+                      marginTop: "18px",
+                    }}
+                  >
+                    <strong>{t.checkAnalysisFailed}</strong>
+                    <p>{error}</p>
                   </div>
                 )}
 
-                {/* INVESTIGATION REPORT */}
-                {result.investigation && (
-                  <div className="investigation-report">
-                    <div className="investigation-header">
+                {/* CONVERSATION RESULTS */}
+                {conversationResult && (
+                  <section
+                    style={{
+                      marginTop: "30px",
+                      paddingTop: "28px",
+                      borderTop: "1px solid #e3e7eb",
+                    }}
+                  >
+                    <div className="results-heading">
                       <div>
                         <div className="eyebrow">
-                          {t.investigationReport}
+                          {t.conversationResults}
                         </div>
 
-                        <h3>{t.investigationTitle}</h3>
+                        <h3>
+                          {t.conversationOverview}
+                        </h3>
                       </div>
 
-                      <span className="investigation-badge">
-                        {t.explainableAnalysis}
+                      <span
+                        className={`risk-badge ${getRiskClass(
+                          conversationResult.overall_risk_level
+                        )}`}
+                      >
+                        {formatRisk(
+                          conversationResult.overall_risk_level
+                        )}
                       </span>
                     </div>
 
-                    <p className="investigation-summary">
-                      {result.investigation.summary
-                        ? language === "en"
-                          ? result.investigation.summary
-                          : result.signalCount === 0
-                          ? t.investigationNoSignals
-                          : `${result.signalCount} ${t.investigationSignals}`
-                        : formatSummary(
-                            result.summary,
-                            result.riskLevel,
-                            result.signalCount
-                          )}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "12px",
+                        flexWrap: "wrap",
+                        margin: "18px 0",
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: "12px 16px",
+                          borderRadius: "12px",
+                          background: "#f4f6f8",
+                        }}
+                      >
+                        <strong>
+                          {conversationResult.message_count}
+                        </strong>{" "}
+                        {t.messagesAnalyzed}
+                      </div>
+
+                      <div
+                        style={{
+                          padding: "12px 16px",
+                          borderRadius: "12px",
+                          background: "#f4f6f8",
+                        }}
+                      >
+                        <strong>
+                          {conversationResult.escalation
+                            ?.stage_count || 0}
+                        </strong>{" "}
+                        {t.warningStages}
+                      </div>
+                    </div>
+
+                    <p className="result-summary">
+                      {conversationResult.escalation
+                        ?.summary ||
+                        t.noProgression}
                     </p>
 
-                    {/* CLAIMS */}
-                    {result.investigation.claims?.length > 0 && (
-                      <div className="investigation-block">
-                        <div className="investigation-block-title">
-                          <span className="investigation-icon">
-                            C
-                          </span>
-
-                          <div>
-                            <strong>
-                              {t.claimsDetected}
-                            </strong>
-
-                            <small>
-                              {t.claimsDescription}
-                            </small>
-                          </div>
-                        </div>
-
-                        <div className="claims-list">
-                          {result.investigation.claims.map(
-                            (claim, index) => (
-                              <div
-                                className="claim-card"
-                                key={`${claim.claim}-${index}`}
-                              >
-                                <strong>
-                                  {formatClaim(claim.claim)}
-                                </strong>
-
-                                <span>
-                                  {formatClaimStatus(
-                                    claim.status
-                                  )}
-                                </span>
-                              </div>
-                            )
+                    {/* ESCALATION SUMMARY */}
+                    {conversationResult.escalation && (
+                      <div
+                        style={{
+                          marginTop: "20px",
+                          padding: "18px",
+                          borderRadius: "14px",
+                          border: "1px solid #e3e7eb",
+                          background:
+                            conversationResult.escalation.pattern ===
+                            "escalating_action_pressure"
+                              ? "#fff8ed"
+                              : "#fafbfc",
+                        }}
+                      >
+                        <strong>
+                          {formatConversationPattern(
+                            conversationResult.escalation.pattern
                           )}
-                        </div>
+                        </strong>
+
+                        <p
+                          style={{
+                            margin: "8px 0 0",
+                            lineHeight: 1.6,
+                          }}
+                        >
+                          {conversationResult.escalation.summary}
+                        </p>
                       </div>
                     )}
 
-                    {/* EVIDENCE */}
-                    {result.investigation.evidence?.length > 0 && (
-                      <div className="investigation-block">
-                        <div className="investigation-block-title">
-                          <span className="investigation-icon">
-                            E
-                          </span>
+                    <p
+                      style={{
+                        marginTop: "16px",
+                        opacity: 0.72,
+                        fontSize: "0.92rem",
+                      }}
+                    >
+                      {t.chronologicalWarning}
+                    </p>
 
-                          <div>
-                            <strong>
-                              {t.evidenceMessage}
-                            </strong>
+                    {/* TIMELINE */}
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0",
+                        marginTop: "22px",
+                      }}
+                    >
+                      {conversationResult.timeline?.map(
+                        (timelineItem, index) => {
+                          const hasSignals =
+                            timelineItem.signals?.length > 0;
 
-                            <small>
-                              {t.evidenceDescription}
-                            </small>
-                          </div>
-                        </div>
+                          const isLast =
+                            index ===
+                            conversationResult.timeline.length - 1;
 
-                        <div className="evidence-list">
-                          {result.investigation.evidence.map(
-                            (item, index) => (
+                          return (
+                            <div
+                              key={timelineItem.message_number}
+                              style={{
+                                display: "grid",
+                                gridTemplateColumns:
+                                  "42px minmax(0, 1fr)",
+                                columnGap: "14px",
+                              }}
+                            >
                               <div
-                                className="evidence-card"
-                                key={`${item.text}-${index}`}
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                }}
                               >
-                                <div className="evidence-quote">
-                                  “{item.text}”
+                                <div
+                                  style={{
+                                    width: "34px",
+                                    height: "34px",
+                                    borderRadius: "50%",
+                                    display: "grid",
+                                    placeItems: "center",
+                                    fontWeight: 800,
+                                    fontSize: "0.85rem",
+                                    background:
+                                      timelineItem.risk_level ===
+                                      "high"
+                                        ? "#fee2e2"
+                                        : timelineItem.risk_level ===
+                                          "medium"
+                                        ? "#fff3cd"
+                                        : "#e8f5e9",
+                                  }}
+                                >
+                                  {timelineItem.message_number}
                                 </div>
 
-                                <p>
-                                  {formatEvidenceReason(
-                                    item.reason
+                                {!isLast && (
+                                  <div
+                                    style={{
+                                      width: "2px",
+                                      flex: 1,
+                                      minHeight: "30px",
+                                      background: "#e1e5e8",
+                                      margin: "5px 0",
+                                    }}
+                                  />
+                                )}
+                              </div>
+
+                              <div
+                                style={{
+                                  paddingBottom: isLast
+                                    ? "0"
+                                    : "22px",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    padding: "16px",
+                                    borderRadius: "14px",
+                                    border:
+                                      "1px solid #e3e7eb",
+                                    background: "#ffffff",
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent:
+                                        "space-between",
+                                      gap: "10px",
+                                      flexWrap: "wrap",
+                                      marginBottom: "10px",
+                                    }}
+                                  >
+                                    <strong>
+                                      {t.messageLabel}{" "}
+                                      {timelineItem.message_number}
+                                    </strong>
+
+                                    <span
+                                      className={`risk-badge ${getRiskClass(
+                                        timelineItem.risk_level
+                                      )}`}
+                                    >
+                                      {formatRisk(
+                                        timelineItem.risk_level
+                                      )}
+                                    </span>
+                                  </div>
+
+                                  <p
+                                    style={{
+                                      margin: 0,
+                                      lineHeight: 1.65,
+                                    }}
+                                  >
+                                    {timelineItem.text}
+                                  </p>
+
+                                  {hasSignals ? (
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        flexDirection:
+                                          "column",
+                                        gap: "8px",
+                                        marginTop: "14px",
+                                      }}
+                                    >
+                                      {timelineItem.signals.map(
+                                        (
+                                          signal,
+                                          signalIndex
+                                        ) => (
+                                          <div
+                                            key={`${signal.type}-${signalIndex}`}
+                                            style={{
+                                              padding:
+                                                "10px 12px",
+                                              borderRadius:
+                                                "10px",
+                                              background:
+                                                "#fff8ed",
+                                            }}
+                                          >
+                                            <strong>
+                                              {formatSignalTitle(
+                                                signal.type
+                                              )}
+                                            </strong>
+
+                                            {signal.evidence && (
+                                              <p
+                                                style={{
+                                                  margin:
+                                                    "4px 0 0",
+                                                  fontSize:
+                                                    "0.9rem",
+                                                  lineHeight:
+                                                    1.5,
+                                                }}
+                                              >
+                                                {
+                                                  signal.evidence
+                                                }
+                                              </p>
+                                            )}
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <p
+                                      style={{
+                                        margin:
+                                          "12px 0 0",
+                                        opacity: 0.65,
+                                        fontSize:
+                                          "0.9rem",
+                                      }}
+                                    >
+                                      {t.noWarningSignals}
+                                    </p>
                                   )}
-                                </p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
+
+                    {/* DETECTED STAGES */}
+                    {conversationResult.escalation
+                      ?.stages?.length > 0 && (
+                      <div
+                        style={{
+                          marginTop: "26px",
+                          padding: "18px",
+                          borderRadius: "14px",
+                          background: "#f7f9fa",
+                        }}
+                      >
+                        <div className="eyebrow">
+                          {t.warningStages}
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "12px",
+                            marginTop: "14px",
+                          }}
+                        >
+                          {conversationResult.escalation.stages.map(
+                            (stage, index) => (
+                              <div
+                                key={`${stage.type}-${stage.message_number}`}
+                                style={{
+                                  display: "grid",
+                                  gridTemplateColumns:
+                                    "34px minmax(0, 1fr)",
+                                  gap: "12px",
+                                  alignItems: "start",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    width: "30px",
+                                    height: "30px",
+                                    borderRadius: "50%",
+                                    display: "grid",
+                                    placeItems: "center",
+                                    background:
+                                      "#ffffff",
+                                    border:
+                                      "1px solid #dfe4e7",
+                                    fontSize:
+                                      "0.8rem",
+                                    fontWeight: 800,
+                                  }}
+                                >
+                                  {index + 1}
+                                </span>
+
+                                <div>
+                                  <strong>
+                                    {formatConversationStage(
+                                      stage.type
+                                    )}
+                                  </strong>
+
+                                  <small
+                                    style={{
+                                      display:
+                                        "block",
+                                      marginTop:
+                                        "3px",
+                                      opacity: 0.65,
+                                    }}
+                                  >
+                                    {t.messageLabel}{" "}
+                                    {
+                                      stage.message_number
+                                    }
+                                  </small>
+
+                                  <p
+                                    style={{
+                                      margin:
+                                        "6px 0 0",
+                                      lineHeight:
+                                        1.55,
+                                    }}
+                                  >
+                                    {formatConversationStageDescription(
+                                      stage
+                                    )}
+                                  </p>
+                                </div>
                               </div>
                             )
                           )}
@@ -1438,344 +2094,728 @@ function App() {
                       </div>
                     )}
 
-                    {/* VERIFICATION CENTER */}
-                    {result.investigation.verification_items?.length > 0 && (
-                      <div className="verification-center">
-                        <div className="verification-center-header">
+                    <div
+                      style={{
+                        marginTop: "20px",
+                        padding: "14px 16px",
+                        borderRadius: "12px",
+                        background: "#f7f9fa",
+                        fontSize: "0.9rem",
+                        lineHeight: 1.55,
+                      }}
+                    >
+                      <strong>{t.important}</strong>{" "}
+                      {t.conversationDisclaimer}
+                    </div>
+
+                    <button
+                      className="text-button"
+                      type="button"
+                      onClick={clearConversation}
+                      style={{
+                        marginTop: "18px",
+                      }}
+                    >
+                      {t.clearAnalysis}
+                    </button>
+                  </section>
+                )}
+
+                {!conversationResult && !conversationLoading && (
+                  <p
+                    style={{
+                      marginTop: "18px",
+                      opacity: 0.65,
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    {t.conversationDisclaimer}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <>
+                {/* IMAGE UPLOAD */}
+                <div className="image-upload">
+                  <label htmlFor="image-upload">
+                    {t.screenshot}
+                  </label>
+
+                  <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => {
+                      setFile(
+                        event.target.files?.[0] || null
+                      );
+                      setError("");
+                      setResult(null);
+                    }}
+                  />
+
+                  {file && (
+                    <small>
+                      {t.selected} {file.name}
+                    </small>
+                  )}
+
+                  <button
+                    type="button"
+                    className="analyze-button"
+                    onClick={analyzeImage}
+                    disabled={!file || loading}
+                  >
+                    {loading
+                      ? t.analyzingImage
+                      : t.analyzeScreenshot}
+
+                    <span>→</span>
+                  </button>
+                </div>
+
+                {/* ERROR */}
+                {error && (
+                  <div
+                    className="error-message"
+                    role="alert"
+                  >
+                    <strong>
+                      {t.checkAnalysisFailed}
+                    </strong>
+                    <p>{error}</p>
+                  </div>
+                )}
+
+                {/* TEXT ANALYSIS */}
+                <form onSubmit={analyzeMessage}>
+                  <label htmlFor="message">
+                    {t.messageOffer}
+                  </label>
+
+                  <textarea
+                    id="message"
+                    value={message}
+                    onChange={(event) =>
+                      setMessage(event.target.value)
+                    }
+                    placeholder={t.messagePlaceholder}
+                    rows={5}
+                  />
+
+                  <div className="input-footer">
+                    <span>
+                      {message.length} characters
+                    </span>
+
+                    <button
+                      type="button"
+                      className={`voice-button ${
+                        isListening ? "listening" : ""
+                      }`}
+                      onClick={
+                        isListening
+                          ? stopVoiceInput
+                          : startVoiceInput
+                      }
+                      disabled={!voiceSupported}
+                    >
+                      <span>
+                        {isListening ? "■" : "🎙"}
+                      </span>
+
+                      {isListening
+                        ? t.stopListening
+                        : t.speakMessage}
+                    </button>
+                  </div>
+
+                  <button
+                    className="analyze-button"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading
+                      ? t.analyzingMessage
+                      : t.analyzeWarning}
+
+                    <span>→</span>
+                  </button>
+                </form>
+
+                {/* RESULTS */}
+                {result && (
+                  <div
+                    className="results"
+                    aria-live="polite"
+                  >
+                    <div className="results-heading">
+                      <div>
+                        <div className="eyebrow">
+                          {t.analysisResults}
+                        </div>
+
+                        <h3>{t.whatFound}</h3>
+                      </div>
+
+                      <span
+                        className={`risk-badge ${getRiskClass(
+                          result.riskLevel
+                        )}`}
+                      >
+                        {formatRisk(result.riskLevel)}
+                      </span>
+                    </div>
+
+                    <p className="result-summary">
+                      {formatSummary(
+                        result.summary,
+                        result.riskLevel,
+                        result.signalCount
+                      )}
+                    </p>
+
+                    {/* OCR TEXT */}
+                    {result.extractedText && (
+                      <div className="extracted-text">
+                        <strong>
+                          {t.extractedText}
+                        </strong>
+
+                        <p>
+                          {result.extractedText}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* WARNING SIGNALS */}
+                    {result.signals.length > 0 ? (
+                      <div className="signals-list">
+                        {result.signals.map(
+                          (signal, index) => (
+                            <div
+                              className="signal"
+                              key={`${signal.type}-${index}`}
+                            >
+                              <span className="signal-icon">
+                                !
+                              </span>
+
+                              <div>
+                                <strong>
+                                  {formatSignalTitle(
+                                    signal.type
+                                  )}
+                                </strong>
+
+                                <p>
+                                  {signal.evidence}
+                                </p>
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <div className="no-signals">
+                        {t.noSignals}
+                      </div>
+                    )}
+
+                    {/* INVESTIGATION REPORT */}
+                    {result.investigation && (
+                      <div className="investigation-report">
+                        <div className="investigation-header">
                           <div>
                             <div className="eyebrow">
-                              {t.verificationCenter}
+                              {t.investigationReport}
                             </div>
 
                             <h3>
-                              {t.verificationTitle}
+                              {t.investigationTitle}
                             </h3>
-
-                            <p>
-                              {t.verificationDescription}
-                            </p>
                           </div>
 
-                          <span className="verification-count">
-                            {result.investigation.verification_items.length}{" "}
-                            {result.investigation.verification_items.length ===
-                            1
-                              ? t.verificationCountOne
-                              : t.verificationCountMany}
+                          <span className="investigation-badge">
+                            {t.explainableAnalysis}
                           </span>
                         </div>
 
-                        <div className="verification-items">
-                          {result.investigation.verification_items.map(
-                            (item, index) => (
-                              <div
-                                className="verification-item"
-                                key={`${item.category}-${index}`}
-                              >
-                                <div className="verification-item-top">
-                                  <span className="verification-number">
-                                    {String(index + 1).padStart(2, "0")}
-                                  </span>
-
-                                  <div>
-                                    <span className="verification-category">
-                                      {formatVerificationCategory(
-                                        item.category
-                                      )}
-                                    </span>
-
-                                    <h4>
-                                      {formatVerificationClaim(
-                                        item.claim
-                                      )}
-                                    </h4>
-                                  </div>
-                                </div>
-
-                                <div className="verification-question">
-                                  <span>?</span>
-
-                                  <div>
-                                    <strong>
-                                      {t.verificationQuestion}
-                                    </strong>
-
-                                    <p>
-                                      {formatVerificationQuestion(
-                                        item.question
-                                      )}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <div className="verification-action">
-                                  <span>✓</span>
-
-                                  <div>
-                                    <strong>
-                                      {t.safeNextStep}
-                                    </strong>
-
-                                    <p>
-                                      {formatVerificationAction(
-                                        item.action
-                                      )}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <span
-                                  className={`verification-status ${item.status}`}
-                                >
-                                  {formatVerificationStatus(
-                                    item.status
-                                  )}
-                                </span>
-                              </div>
-                            )
-                          )}
-                        </div>
-
-                        <div className="verification-disclaimer">
-                          <strong>{t.important}</strong>{" "}
-                          {t.detectedClaimNotVerified}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* URL INTELLIGENCE */}
-                {result.urlAnalysis?.urls?.length > 0 && (
-                  <section className="url-intelligence">
-                    <div className="url-intelligence-header">
-                      <div>
-                        <span className="section-kicker">
-                          {t.linkAnalysis}
-                        </span>
-
-                        <h3>
-                          {t.urlIntelligence}
-                        </h3>
-
-                        <p>
-                          {t.urlDescription}
+                        <p className="investigation-summary">
+                          {result.investigation.summary
+                            ? language === "en"
+                              ? result.investigation.summary
+                              : result.signalCount === 0
+                              ? t.investigationNoSignals
+                              : `${result.signalCount} ${t.investigationSignals}`
+                            : formatSummary(
+                                result.summary,
+                                result.riskLevel,
+                                result.signalCount
+                              )}
                         </p>
-                      </div>
 
-                      <span className="url-count">
-                        {result.urlAnalysis.urls.length}{" "}
-                        {result.urlAnalysis.urls.length === 1
-                          ? t.urlCountOne
-                          : t.urlCountMany}
-                      </span>
-                    </div>
-
-                    <div className="url-list">
-                      {result.urlAnalysis.urls.map(
-                        (urlInfo, index) => (
-                          <div
-                            className="url-card"
-                            key={`${urlInfo.url}-${index}`}
-                          >
-                            <div className="url-card-top">
-                              <span className="url-number">
-                                {String(index + 1).padStart(2, "0")}
+                        {/* CLAIMS */}
+                        {result.investigation.claims?.length > 0 && (
+                          <div className="investigation-block">
+                            <div className="investigation-block-title">
+                              <span className="investigation-icon">
+                                C
                               </span>
 
-                              <div className="url-details">
+                              <div>
                                 <strong>
-                                  {urlInfo.hostname}
+                                  {t.claimsDetected}
                                 </strong>
 
                                 <small>
-                                  {urlInfo.url}
+                                  {t.claimsDescription}
                                 </small>
                               </div>
                             </div>
 
-                            {urlInfo.signals?.length > 0 ? (
-                              <div className="url-signals">
-                                {urlInfo.signals.map(
-                                  (
-                                    signal,
-                                    signalIndex
-                                  ) => (
-                                    <div
-                                      className="url-signal"
-                                      key={`${signal.type}-${signalIndex}`}
-                                    >
-                                      <span className="url-signal-icon">
-                                        !
+                            <div className="claims-list">
+                              {result.investigation.claims.map(
+                                (claim, index) => (
+                                  <div
+                                    className="claim-card"
+                                    key={`${claim.claim}-${index}`}
+                                  >
+                                    <strong>
+                                      {formatClaim(
+                                        claim.claim
+                                      )}
+                                    </strong>
+
+                                    <span>
+                                      {formatClaimStatus(
+                                        claim.status
+                                      )}
+                                    </span>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* EVIDENCE */}
+                        {result.investigation.evidence?.length > 0 && (
+                          <div className="investigation-block">
+                            <div className="investigation-block-title">
+                              <span className="investigation-icon">
+                                E
+                              </span>
+
+                              <div>
+                                <strong>
+                                  {t.evidenceMessage}
+                                </strong>
+
+                                <small>
+                                  {t.evidenceDescription}
+                                </small>
+                              </div>
+                            </div>
+
+                            <div className="evidence-list">
+                              {result.investigation.evidence.map(
+                                (item, index) => (
+                                  <div
+                                    className="evidence-card"
+                                    key={`${item.text}-${index}`}
+                                  >
+                                    <div className="evidence-quote">
+                                      “{item.text}”
+                                    </div>
+
+                                    <p>
+                                      {formatEvidenceReason(
+                                        item.reason
+                                      )}
+                                    </p>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* VERIFICATION CENTER */}
+                        {result.investigation.verification_items?.length > 0 && (
+                          <div className="verification-center">
+                            <div className="verification-center-header">
+                              <div>
+                                <div className="eyebrow">
+                                  {t.verificationCenter}
+                                </div>
+
+                                <h3>
+                                  {t.verificationTitle}
+                                </h3>
+
+                                <p>
+                                  {t.verificationDescription}
+                                </p>
+                              </div>
+
+                              <span className="verification-count">
+                                {
+                                  result.investigation
+                                    .verification_items
+                                    .length
+                                }{" "}
+                                {result.investigation
+                                  .verification_items
+                                  .length === 1
+                                  ? t.verificationCountOne
+                                  : t.verificationCountMany}
+                              </span>
+                            </div>
+
+                            <div className="verification-items">
+                              {result.investigation.verification_items.map(
+                                (item, index) => (
+                                  <div
+                                    className="verification-item"
+                                    key={`${item.category}-${index}`}
+                                  >
+                                    <div className="verification-item-top">
+                                      <span className="verification-number">
+                                        {String(
+                                          index + 1
+                                        ).padStart(2, "0")}
                                       </span>
 
                                       <div>
-                                        <strong>
-                                          {formatUrlSignalTitle(
-                                            signal.type,
-                                            signal.title
+                                        <span className="verification-category">
+                                          {formatVerificationCategory(
+                                            item.category
                                           )}
+                                        </span>
+
+                                        <h4>
+                                          {formatVerificationClaim(
+                                            item.claim
+                                          )}
+                                        </h4>
+                                      </div>
+                                    </div>
+
+                                    <div className="verification-question">
+                                      <span>?</span>
+
+                                      <div>
+                                        <strong>
+                                          {t.verificationQuestion}
                                         </strong>
 
                                         <p>
-                                          {t.urlEvidence}{" "}
-                                          {signal.evidence}
+                                          {formatVerificationQuestion(
+                                            item.question
+                                          )}
                                         </p>
                                       </div>
-
-                                      <span
-                                        className={`url-severity ${signal.severity}`}
-                                      >
-                                        {language === "hi"
-                                          ? signal.severity ===
-                                            "high"
-                                            ? "उच्च"
-                                            : signal.severity ===
-                                              "medium"
-                                            ? "मध्यम"
-                                            : "कम"
-                                          : signal.severity.toUpperCase()}
-                                      </span>
                                     </div>
-                                  )
-                                )}
-                              </div>
-                            ) : (
-                              <div className="url-no-signals">
-                                {t.urlNoSignals}
-                              </div>
-                            )}
-                          </div>
-                        )
-                      )}
-                    </div>
 
-                    <div className="url-disclaimer">
-                      <strong>{t.important}</strong>{" "}
-                      {t.urlDisclaimer}
-                    </div>
-                  </section>
-                )}
+                                    <div className="verification-action">
+                                      <span>✓</span>
 
-                {/* BEFORE YOU PAY */}
-                {result.beforeYouPay && (
-                  <section className="before-you-pay">
-                    <div className="before-you-pay-header">
-                      <div>
-                        <span className="section-kicker">
-                          {t.safetyCheck}
-                        </span>
+                                      <div>
+                                        <strong>
+                                          {t.safeNextStep}
+                                        </strong>
 
-                        <h3>
-                          {t.beforeYouPay}
-                        </h3>
+                                        <p>
+                                          {formatVerificationAction(
+                                            item.action
+                                          )}
+                                        </p>
+                                      </div>
+                                    </div>
 
-                        <p>
-                          {formatBeforeYouPayDescription(
-                            result.beforeYouPay.description
-                          )}
-                        </p>
-                      </div>
-
-                      <span className="before-you-pay-shield">
-                        🛡
-                      </span>
-                    </div>
-
-                    <div className="before-you-pay-list">
-                      {result.beforeYouPay.checks?.map(
-                        (check, index) => (
-                          <div
-                            className="before-you-pay-item"
-                            key={check.id || index}
-                          >
-                            <div className="before-you-pay-number">
-                              {String(index + 1).padStart(2, "0")}
+                                    <span
+                                      className={`verification-status ${item.status}`}
+                                    >
+                                      {formatVerificationStatus(
+                                        item.status
+                                      )}
+                                    </span>
+                                  </div>
+                                )
+                              )}
                             </div>
 
-                            <div className="before-you-pay-content">
-                              <div className="before-you-pay-item-top">
-                                <h4>
-                                  {formatBeforeYouPayTitle(
-                                    check.id,
-                                    check.title
-                                  )}
-                                </h4>
-
-                                <span
-                                  className={`before-you-pay-priority ${
-                                    check.priority || "medium"
-                                  }`}
-                                >
-                                  {formatPriority(
-                                    check.priority
-                                  )}
-                                </span>
-                              </div>
-
-                              <p>
-                                {formatBeforeYouPayAction(
-                                  check.id,
-                                  check.action
-                                )}
-                              </p>
+                            <div className="verification-disclaimer">
+                              <strong>
+                                {t.important}
+                              </strong>{" "}
+                              {t.detectedClaimNotVerified}
                             </div>
                           </div>
-                        )
-                      )}
-                    </div>
-
-                    {result.beforeYouPay.disclaimer && (
-                      <div className="before-you-pay-disclaimer">
-                        <strong>{t.important}</strong>{" "}
-                        {language === "hi"
-                          ? t.beforeYouPayDisclaimer
-                          : result.beforeYouPay.disclaimer}
+                        )}
                       </div>
                     )}
-                  </section>
+
+                    {/* URL INTELLIGENCE */}
+                    {result.urlAnalysis?.urls?.length > 0 && (
+                      <section className="url-intelligence">
+                        <div className="url-intelligence-header">
+                          <div>
+                            <span className="section-kicker">
+                              {t.linkAnalysis}
+                            </span>
+
+                            <h3>
+                              {t.urlIntelligence}
+                            </h3>
+
+                            <p>
+                              {t.urlDescription}
+                            </p>
+                          </div>
+
+                          <span className="url-count">
+                            {
+                              result.urlAnalysis.urls
+                                .length
+                            }{" "}
+                            {result.urlAnalysis.urls
+                              .length === 1
+                              ? t.urlCountOne
+                              : t.urlCountMany}
+                          </span>
+                        </div>
+
+                        <div className="url-list">
+                          {result.urlAnalysis.urls.map(
+                            (urlInfo, index) => (
+                              <div
+                                className="url-card"
+                                key={`${urlInfo.url}-${index}`}
+                              >
+                                <div className="url-card-top">
+                                  <span className="url-number">
+                                    {String(
+                                      index + 1
+                                    ).padStart(2, "0")}
+                                  </span>
+
+                                  <div className="url-details">
+                                    <strong>
+                                      {
+                                        urlInfo.hostname
+                                      }
+                                    </strong>
+
+                                    <small>
+                                      {urlInfo.url}
+                                    </small>
+                                  </div>
+                                </div>
+
+                                {urlInfo.signals?.length > 0 ? (
+                                  <div className="url-signals">
+                                    {urlInfo.signals.map(
+                                      (
+                                        signal,
+                                        signalIndex
+                                      ) => (
+                                        <div
+                                          className="url-signal"
+                                          key={`${signal.type}-${signalIndex}`}
+                                        >
+                                          <span className="url-signal-icon">
+                                            !
+                                          </span>
+
+                                          <div>
+                                            <strong>
+                                              {formatUrlSignalTitle(
+                                                signal.type,
+                                                signal.title
+                                              )}
+                                            </strong>
+
+                                            <p>
+                                              {
+                                                t.urlEvidence
+                                              }{" "}
+                                              {
+                                                signal.evidence
+                                              }
+                                            </p>
+                                          </div>
+
+                                          <span
+                                            className={`url-severity ${signal.severity}`}
+                                          >
+                                            {language === "hi"
+                                              ? signal.severity ===
+                                                "high"
+                                                ? "उच्च"
+                                                : signal.severity ===
+                                                  "medium"
+                                                ? "मध्यम"
+                                                : "कम"
+                                              : signal.severity.toUpperCase()}
+                                          </span>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="url-no-signals">
+                                    {t.urlNoSignals}
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          )}
+                        </div>
+
+                        <div className="url-disclaimer">
+                          <strong>
+                            {t.important}
+                          </strong>{" "}
+                          {t.urlDisclaimer}
+                        </div>
+                      </section>
+                    )}
+
+                    {/* BEFORE YOU PAY */}
+                    {result.beforeYouPay && (
+                      <section className="before-you-pay">
+                        <div className="before-you-pay-header">
+                          <div>
+                            <span className="section-kicker">
+                              {t.safetyCheck}
+                            </span>
+
+                            <h3>
+                              {t.beforeYouPay}
+                            </h3>
+
+                            <p>
+                              {formatBeforeYouPayDescription(
+                                result.beforeYouPay
+                                  .description
+                              )}
+                            </p>
+                          </div>
+
+                          <span className="before-you-pay-shield">
+                            🛡
+                          </span>
+                        </div>
+
+                        <div className="before-you-pay-list">
+                          {result.beforeYouPay.checks?.map(
+                            (check, index) => (
+                              <div
+                                className="before-you-pay-item"
+                                key={check.id || index}
+                              >
+                                <div className="before-you-pay-number">
+                                  {String(
+                                    index + 1
+                                  ).padStart(2, "0")}
+                                </div>
+
+                                <div className="before-you-pay-content">
+                                  <div className="before-you-pay-item-top">
+                                    <h4>
+                                      {formatBeforeYouPayTitle(
+                                        check.id,
+                                        check.title
+                                      )}
+                                    </h4>
+
+                                    <span
+                                      className={`before-you-pay-priority ${
+                                        check.priority ||
+                                        "medium"
+                                      }`}
+                                    >
+                                      {formatPriority(
+                                        check.priority
+                                      )}
+                                    </span>
+                                  </div>
+
+                                  <p>
+                                    {formatBeforeYouPayAction(
+                                      check.id,
+                                      check.action
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
+
+                        {result.beforeYouPay.disclaimer && (
+                          <div className="before-you-pay-disclaimer">
+                            <strong>
+                              {t.important}
+                            </strong>{" "}
+                            {language === "hi"
+                              ? t.beforeYouPayDisclaimer
+                              : result.beforeYouPay
+                                  .disclaimer}
+                          </div>
+                        )}
+                      </section>
+                    )}
+
+                    {/* SAFETY ACTIONS */}
+                    {result.safetyActions &&
+                      result.safetyActions.length > 0 && (
+                        <div className="safety-callout">
+                          <strong>
+                            {t.recommendedSafety}
+                          </strong>
+
+                          <ul>
+                            {result.safetyActions.map(
+                              (action, index) => (
+                                <li
+                                  key={`${action}-${index}`}
+                                >
+                                  {formatSafetyAction(
+                                    action
+                                  )}
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </div>
+                      )}
+
+                    <button
+                      className="text-button"
+                      type="button"
+                      onClick={clearAnalysis}
+                    >
+                      {t.clearAnalysis}
+                    </button>
+                  </div>
                 )}
 
-                {/* SAFETY ACTIONS */}
-                {result.safetyActions &&
-                  result.safetyActions.length > 0 && (
-                    <div className="safety-callout">
-                      <strong>
-                        {t.recommendedSafety}
-                      </strong>
-
-                      <ul>
-                        {result.safetyActions.map(
-                          (action, index) => (
-                            <li
-                              key={`${action}-${index}`}
-                            >
-                              {formatSafetyAction(action)}
-                            </li>
-                          )
-                        )}
-                      </ul>
-                    </div>
-                  )}
-
-                <button
-                  className="text-button"
-                  type="button"
-                  onClick={clearAnalysis}
-                >
-                  {t.clearAnalysis}
-                </button>
-              </div>
+                <p className="disclaimer">
+                  {t.disclaimer}
+                </p>
+              </>
             )}
-
-            <p className="disclaimer">
-              {t.disclaimer}
-            </p>
           </div>
         </section>
 
         {/* SAFETY TIPS */}
-        <section className="safety-section" id="safety">
+        <section
+          className="safety-section"
+          id="safety"
+        >
           <div className="section-heading">
             <div className="eyebrow">
               {t.investorAwareness}
@@ -1816,7 +2856,10 @@ function App() {
 
       {/* FOOTER */}
       <footer>
-        <a className="brand footer-brand" href="#home">
+        <a
+          className="brand footer-brand"
+          href="#home"
+        >
           <span className="brand-icon">N</span>
 
           <span>
