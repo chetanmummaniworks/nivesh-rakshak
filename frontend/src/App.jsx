@@ -42,6 +42,16 @@ const translations = {
     analysisResults: "ANALYSIS RESULTS",
     whatFound: "What we found",
 
+    quickSafetyTitle: "Pause before you act",
+    quickSafetyDescription:
+      "These are the most important things to do before sending money or sharing information.",
+    whyWarning: "Why did I get this warning?",
+    detailedAnalysis: "Detailed analysis",
+    linkDetails: "Check the link",
+    beforePayDetails: "See the full safety checklist",
+    moreSafetyGuidance: "More safety guidance",
+    hideDetails: "Hide details",
+
     investigationReport: "INVESTIGATION REPORT",
     investigationTitle: "Why this deserves attention",
     explainableAnalysis: "Explainable analysis",
@@ -227,6 +237,16 @@ const translations = {
 
     analysisResults: "विश्लेषण परिणाम",
     whatFound: "क्या पाया गया",
+
+    quickSafetyTitle: "अभी रुकें और जांचें",
+    quickSafetyDescription:
+      "पैसे भेजने या जानकारी साझा करने से पहले इन जरूरी बातों की जांच करें।",
+    whyWarning: "मुझे यह चेतावनी क्यों मिली?",
+    detailedAnalysis: "विस्तृत विश्लेषण",
+    linkDetails: "लिंक की जांच करें",
+    beforePayDetails: "पूरी सुरक्षा जांच देखें",
+    moreSafetyGuidance: "अन्य सुरक्षा सुझाव",
+    hideDetails: "विवरण छिपाएं",
 
     investigationReport: "जांच रिपोर्ट",
     investigationTitle: "इस पर ध्यान क्यों देना चाहिए",
@@ -654,28 +674,28 @@ function App() {
   function formatSignalTitle(type) {
     const titles = {
       guaranteed_return: {
-        en: "Guaranteed return claims",
-        hi: "गारंटीड रिटर्न का दावा",
+        en: "Guaranteed return claim",
+        hi: "पक्के मुनाफे का दावा",
       },
 
       urgency: {
-        en: "Urgency and pressure",
+        en: "Pressure to act quickly",
         hi: "जल्दी करने का दबाव",
       },
 
       sensitive_information: {
-        en: "Sensitive information request",
-        hi: "संवेदनशील जानकारी की मांग",
+        en: "OTP / PIN / password request",
+        hi: "OTP / PIN / पासवर्ड की मांग",
       },
 
       authority_claim: {
-        en: "Authority or approval claim",
-        hi: "प्राधिकरण या मंजूरी का दावा",
+        en: "SEBI / government approval claim",
+        hi: "SEBI / सरकारी मंजूरी का दावा",
       },
 
       payment_request: {
-        en: "Payment request",
-        hi: "भुगतान का अनुरोध",
+        en: "Request to send money",
+        hi: "पैसे भेजने का अनुरोध",
       },
     };
 
@@ -686,6 +706,84 @@ function App() {
     return type
       .replaceAll("_", " ")
       .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  }
+
+  // -----------------------------
+  // SIMPLE USER-FACING SAFETY HELPERS
+  // -----------------------------
+  function formatSignalEvidence(evidence) {
+    if (language === "en") {
+      return evidence;
+    }
+
+    const evidenceMap = {
+      "The message contains guaranteed, assured, fixed-return, or risk-free language about a financial outcome.":
+        "संदेश में पक्के, तय या जोखिम-मुक्त मुनाफे की बात की गई है।",
+
+      "The message uses pressure or urgency to encourage quick action.":
+        "संदेश आपको जल्दी कार्रवाई करने के लिए दबाव डालता है।",
+
+      "The message asks the recipient to send money, make a payment, or transfer funds.":
+        "संदेश आपसे पैसे भेजने या भुगतान करने के लिए कहता है।",
+
+      "The message makes an authority or approval claim that should be independently verified.":
+        "संदेश में SEBI या सरकारी मंजूरी का दावा किया गया है। इसे आधिकारिक स्रोत से जांचें।",
+
+      "The message appears to request sensitive authentication or financial information.":
+        "संदेश OTP, PIN, पासवर्ड या अन्य संवेदनशील जानकारी मांगता हुआ दिखाई देता है।",
+    };
+
+    return evidenceMap[evidence] || evidence;
+  }
+
+  function getQuickSafetySteps() {
+    const steps = [];
+
+    const types = new Set(
+      (result?.signals || []).map((signal) => signal.type)
+    );
+
+    if (types.has("payment_request")) {
+      steps.push(
+        language === "hi"
+          ? "पैसे अभी न भेजें।"
+          : "Do not send money yet."
+      );
+    }
+
+    if (types.has("sensitive_information")) {
+      steps.push(
+        language === "hi"
+          ? "OTP, PIN या पासवर्ड साझा न करें।"
+          : "Never share OTPs, PINs, or passwords."
+      );
+    }
+
+    if (types.has("authority_claim")) {
+      steps.push(
+        language === "hi"
+          ? "SEBI/सरकारी दावे को आधिकारिक वेबसाइट से खुद जांचें।"
+          : "Verify the SEBI or government claim using an official source you access yourself."
+      );
+    }
+
+    if (types.has("guaranteed_return")) {
+      steps.push(
+        language === "hi"
+          ? "पक्के मुनाफे को सुरक्षा का प्रमाण न मानें।"
+          : "Do not treat guaranteed profit as proof of safety."
+      );
+    }
+
+    if (types.has("urgency")) {
+      steps.push(
+        language === "hi"
+          ? "जल्दबाजी में फैसला न लें।"
+          : "Do not let urgency make the decision for you."
+      );
+    }
+
+    return [...new Set(steps)].slice(0, 4);
   }
 
   // -----------------------------
@@ -2309,7 +2407,9 @@ function App() {
                                 </strong>
 
                                 <p>
-                                  {signal.evidence}
+                                  {formatSignalEvidence(
+                                    signal.evidence
+                                  )}
                                 </p>
                               </div>
                             </div>
@@ -2321,6 +2421,98 @@ function App() {
                         {t.noSignals}
                       </div>
                     )}
+
+                    {/* SIMPLE FIRST-LAYER SAFETY GUIDANCE */}
+                    {result.signals.length > 0 && (
+                      <div
+                        style={{
+                          marginTop: "22px",
+                          padding: "20px",
+                          borderRadius: "16px",
+                          border: "1px solid #dfe9e3",
+                          background: "#f4faf6",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: "12px",
+                          }}
+                        >
+                          <span
+                            style={{
+                              width: "34px",
+                              height: "34px",
+                              borderRadius: "50%",
+                              display: "grid",
+                              placeItems: "center",
+                              flexShrink: 0,
+                              background: "#ffffff",
+                              border: "1px solid #cfe2d6",
+                              fontWeight: 800,
+                            }}
+                          >
+                            !
+                          </span>
+
+                          <div>
+                            <h4
+                              style={{
+                                margin: 0,
+                                fontSize: "1.05rem",
+                              }}
+                            >
+                              {t.quickSafetyTitle}
+                            </h4>
+
+                            <p
+                              style={{
+                                margin: "6px 0 14px",
+                                lineHeight: 1.55,
+                              }}
+                            >
+                              {t.quickSafetyDescription}
+                            </p>
+
+                            <ul
+                              style={{
+                                margin: 0,
+                                paddingLeft: "20px",
+                                lineHeight: 1.7,
+                              }}
+                            >
+                              {getQuickSafetySteps().map(
+                                (step, index) => (
+                                  <li key={`${step}-${index}`}>
+                                    {step}
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* DETAILED INVESTIGATION */}
+                    <details
+                      style={{
+                        marginTop: "20px",
+                        borderTop: "1px solid #e3e7eb",
+                        paddingTop: "4px",
+                      }}
+                    >
+                      <summary
+                        style={{
+                          cursor: "pointer",
+                          padding: "16px 4px",
+                          fontWeight: 800,
+                          listStylePosition: "inside",
+                        }}
+                      >
+                        {t.whyWarning}
+                      </summary>
 
                     {/* INVESTIGATION REPORT */}
                     {result.investigation && (
@@ -2557,7 +2749,26 @@ function App() {
                       </div>
                     )}
 
+                    </details>
+
                     {/* URL INTELLIGENCE */}
+                    <details
+                      style={{
+                        marginTop: "20px",
+                        borderTop: "1px solid #e3e7eb",
+                        paddingTop: "4px",
+                      }}
+                    >
+                      <summary
+                        style={{
+                          cursor: "pointer",
+                          padding: "16px 4px",
+                          fontWeight: 800,
+                          listStylePosition: "inside",
+                        }}
+                      >
+                        {t.linkDetails}
+                      </summary>
                     {result.urlAnalysis?.urls?.length > 0 && (
                       <section className="url-intelligence">
                         <div className="url-intelligence-header">
@@ -2683,7 +2894,26 @@ function App() {
                       </section>
                     )}
 
+                    </details>
+
                     {/* BEFORE YOU PAY */}
+                    <details
+                      style={{
+                        marginTop: "20px",
+                        borderTop: "1px solid #e3e7eb",
+                        paddingTop: "4px",
+                      }}
+                    >
+                      <summary
+                        style={{
+                          cursor: "pointer",
+                          padding: "16px 4px",
+                          fontWeight: 800,
+                          listStylePosition: "inside",
+                        }}
+                      >
+                        {t.beforePayDetails}
+                      </summary>
                     {result.beforeYouPay && (
                       <section className="before-you-pay">
                         <div className="before-you-pay-header">
@@ -2769,7 +2999,26 @@ function App() {
                       </section>
                     )}
 
+                    </details>
+
                     {/* SAFETY ACTIONS */}
+                    <details
+                      style={{
+                        marginTop: "20px",
+                        borderTop: "1px solid #e3e7eb",
+                        paddingTop: "4px",
+                      }}
+                    >
+                      <summary
+                        style={{
+                          cursor: "pointer",
+                          padding: "16px 4px",
+                          fontWeight: 800,
+                          listStylePosition: "inside",
+                        }}
+                      >
+                        {t.moreSafetyGuidance}
+                      </summary>
                     {result.safetyActions &&
                       result.safetyActions.length > 0 && (
                         <div className="safety-callout">
@@ -2792,6 +3041,8 @@ function App() {
                           </ul>
                         </div>
                       )}
+
+                    </details>
 
                     <button
                       className="text-button"
