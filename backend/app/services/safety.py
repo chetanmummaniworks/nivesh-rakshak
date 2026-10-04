@@ -1,175 +1,309 @@
 def build_before_you_pay(text: str, signals: list, verification_items: list) -> dict:
     """
-    Build an actionable safety checklist before the user takes
-    a potentially risky financial action.
+    Build a personalized, actionable safety checklist based on the
+    warning signals and verification items found in the message.
 
     This is safety guidance, not financial advice.
     """
 
-    lower_text = text.lower()
+    lower_text = text.casefold()
+
+    # Read signal types defensively so this function can handle
+    # incomplete or unexpected analysis results.
+    signal_types = {
+        str(signal.get("type", "")).strip().lower()
+        for signal in signals
+        if isinstance(signal, dict)
+    }
 
     checks = []
+    seen_ids = set()
 
-    # 1. Sender verification
-    checks.append({
-        "id": "sender",
-        "title": "Verify the sender",
-        "action": (
-            "Confirm who sent the message using an independently "
-            "accessed official source."
+    def add_check(
+        check_id: str,
+        title: str,
+        action: str,
+        priority: str = "high",
+    ) -> None:
+        """Add a checklist item only once."""
+        if check_id in seen_ids:
+            return
+
+        seen_ids.add(check_id)
+        checks.append({
+            "id": check_id,
+            "title": title,
+            "action": action,
+            "priority": priority,
+            "completed": False,
+        })
+
+    # 1. Always begin by verifying the sender independently.
+    add_check(
+        "sender",
+        "Verify the sender",
+        (
+            "Confirm who sent the message using an official website "
+            "or contact channel you find independently. Do not rely "
+            "only on the sender's name, profile, links, or screenshots."
         ),
-        "priority": "high",
-        "completed": False,
-    })
+    )
 
-    # 2. Regulatory / authority claims
+    # 2. Regulatory or authority claims.
+    authority_phrases = (
+        "sebi approved",
+        "sebi-approved",
+        "sebi authorised",
+        "sebi-authorised",
+        "sebi authorized",
+        "sebi-authorized",
+        "government approved",
+        "government-approved",
+        "govt approved",
+        "govt-approved",
+        "government authorised",
+        "government-authorised",
+        "government authorized",
+        "government-authorized",
+        "official scheme",
+        "government scheme",
+        "government backed",
+        "government-backed",
+    )
     authority_claim = (
-        "sebi approved" in lower_text
-        or "government approved" in lower_text
-        or "govt approved" in lower_text
-        or "official scheme" in lower_text
+        "authority_claim" in signal_types
+        or any(phrase in lower_text for phrase in authority_phrases)
     )
 
     if authority_claim:
-        checks.append({
-            "id": "authority",
-            "title": "Verify the authority claim",
-            "action": (
-                "Check the claimed approval or association through "
-                "the relevant official website. Do not rely on links "
-                "or screenshots supplied in the message."
+        add_check(
+            "authority",
+            "Verify the authority or approval claim",
+            (
+                "Check the claimed registration, approval, or association "
+                "through the relevant regulator's or organisation's "
+                "official website. A message, logo, certificate image, "
+                "or forwarded link is not proof by itself."
             ),
-            "priority": "high",
-            "completed": False,
-        })
+        )
 
-    # 3. Guaranteed returns
-    guaranteed_return = any(
-        phrase in lower_text
-        for phrase in [
-            "guaranteed return",
-            "guaranteed returns",
-            "guaranteed profit",
-            "no risk",
-            "risk free",
-            "risk-free",
-            "100% safe",
-        ]
+    # 3. Guaranteed, fixed, or risk-free return claims.
+    return_phrases = (
+        "guaranteed return",
+        "guaranteed returns",
+        "guaranteed profit",
+        "guaranteed profits",
+        "guaranteed income",
+        "guaranteed earnings",
+        "fixed return",
+        "fixed returns",
+        "fixed profit",
+        "fixed profits",
+        "risk free",
+        "risk-free",
+        "no risk",
+        "zero risk",
+        "100% safe",
+        "100% guaranteed",
+        "assured return",
+        "assured returns",
+        "assured profit",
+        "assured profits",
+    )
+    guaranteed_return = (
+        "guaranteed_return" in signal_types
+        or any(phrase in lower_text for phrase in return_phrases)
     )
 
     if guaranteed_return:
-        checks.append({
-            "id": "returns",
-            "title": "Question guaranteed-return claims",
-            "action": (
-                "Do not treat guaranteed or risk-free language as "
-                "proof that an investment is safe."
+        add_check(
+            "returns",
+            "Question guaranteed-return claims",
+            (
+                "Do not treat guaranteed, fixed, or risk-free language "
+                "as proof that an investment is safe. Ask for the full "
+                "terms and independently verify the claim before making "
+                "a decision."
             ),
-            "priority": "high",
-            "completed": False,
-        })
+        )
 
-    # 4. Payment request
-    payment_words = [
-        "pay",
-        "payment",
-        "transfer",
+    # 4. Payment request.
+    payment_phrases = (
         "send money",
+        "send the money",
+        "send payment",
+        "send the payment",
+        "transfer money",
+        "transfer the money",
+        "transfer funds",
+        "pay now",
+        "pay today",
+        "payment",
         "deposit",
         "upi",
+        "bank transfer",
         "bank account",
-    ]
+    )
+    payment_request = (
+        "payment_request" in signal_types
+        or any(phrase in lower_text for phrase in payment_phrases)
+    )
 
-    if any(word in lower_text for word in payment_words):
-        checks.append({
-            "id": "payment",
-            "title": "Pause before making a payment",
-            "action": (
-                "Independently confirm the recipient and payment "
-                "details before transferring money."
+    if payment_request:
+        add_check(
+            "payment",
+            "Pause before making a payment",
+            (
+                "Do not transfer money while the offer or recipient is "
+                "unverified. Independently confirm the recipient and "
+                "payment details using a trusted channel, not details "
+                "provided only in the message."
             ),
-            "priority": "high",
-            "completed": False,
-        })
+        )
 
-    # 5. Sensitive credentials
-    sensitive_request = any(
-        phrase in lower_text
-        for phrase in [
-            "share otp",
-            "send otp",
-            "share password",
-            "send password",
-            "upi pin",
-            "share pin",
-            "send pin",
-        ]
+    # 5. Requests for sensitive credentials or financial information.
+    sensitive_phrases = (
+        "share otp",
+        "send otp",
+        "provide otp",
+        "give otp",
+        "enter otp",
+        "share password",
+        "send password",
+        "provide password",
+        "share your password",
+        "send your password",
+        "upi pin",
+        "share pin",
+        "send pin",
+        "provide pin",
+        "share your pin",
+        "send your pin",
+        "share cvv",
+        "send cvv",
+        "share card details",
+        "send card details",
+        "share bank details",
+        "send bank details",
+    )
+    sensitive_request = (
+        "sensitive_information" in signal_types
+        or any(phrase in lower_text for phrase in sensitive_phrases)
     )
 
     if sensitive_request:
-        checks.append({
-            "id": "credentials",
-            "title": "Protect your authentication information",
-            "action": (
-                "Do not share OTPs, passwords, UPI PINs, or other "
-                "authentication information."
+        add_check(
+            "credentials",
+            "Protect your authentication information",
+            (
+                "Never share OTPs, passwords, UPI PINs, or card security "
+                "codes with someone who contacts you. Do not enter them "
+                "through a link supplied in an unsolicited message."
             ),
-            "priority": "critical",
-            "completed": False,
-        })
+            priority="critical",
+        )
 
-    # 6. Urgency
-    urgency = any(
-        phrase in lower_text
-        for phrase in [
-            "invest today",
-            "act now",
-            "limited time",
-            "limited slots",
-            "hurry",
-            "immediately",
-            "only this week",
-        ]
+    # 6. Urgency or pressure to act quickly.
+    urgency_phrases = (
+        "invest today",
+        "act now",
+        "act immediately",
+        "limited time",
+        "limited slots",
+        "limited offer",
+        "limited period",
+        "hurry",
+        "immediately",
+        "only today",
+        "only this week",
+        "last chance",
+        "offer ends today",
+        "offer expires today",
+        "don't miss",
+        "dont miss",
+        "urgent",
+        "do it now",
+        "pay now",
+        "transfer now",
+        "send now",
+        "send money today",
+        "secure your profit",
+        "act fast",
+        "right away",
+        "before it's too late",
+        "don't wait",
+        "dont wait",
+    )
+    urgency = (
+        "urgency" in signal_types
+        or any(phrase in lower_text for phrase in urgency_phrases)
     )
 
     if urgency:
-        checks.append({
-            "id": "urgency",
-            "title": "Do not let urgency make the decision",
-            "action": (
-                "Pause and take time to independently verify the "
-                "message before taking action."
+        add_check(
+            "urgency",
+            "Take time; do not act under pressure",
+            (
+                "Pause and independently verify the claims before acting. "
+                "A deadline or demand for immediate action is not proof "
+                "that the offer is genuine."
             ),
-            "priority": "medium",
-            "completed": False,
-        })
+            priority="high",
+        )
 
-    # Always provide an independent-verification step.
-    checks.append({
-        "id": "independent",
-        "title": "Verify independently",
-        "action": (
-            "Use an official website or contact channel that you "
-            "find independently rather than relying on information "
-            "provided in the message."
+    # 7. Tailor a check to claims that the report says need verification.
+    if isinstance(verification_items, list) and verification_items:
+        add_check(
+            "claims",
+            "Check the report's verification items",
+            (
+                "Review each claim listed in the investigation report. "
+                "Look for confirmation from the relevant official source "
+                "and note any claim you cannot independently verify."
+            ),
+            priority="high",
+        )
+
+    # 8. Always include independent verification.
+    add_check(
+        "independent",
+        "Verify independently before proceeding",
+        (
+            "Open the relevant official website yourself or find its "
+            "contact details independently. Avoid relying on contact "
+            "details, QR codes, or links supplied only by the sender."
         ),
-        "priority": "high",
-        "completed": False,
-    })
+    )
+
+    # 9. If the user may already have acted, provide a safe recovery step.
+    add_check(
+        "already_acted",
+        "If you have already paid or shared information",
+        (
+            "Contact your bank or payment provider promptly through its "
+            "official channel. If credentials were shared, use the "
+            "official service to secure the affected account. In India, "
+            "you can contact the national cybercrime helpline at 1930 "
+            "or visit cybercrime.gov.in to report suspected cybercrime."
+        ),
+        priority="high",
+    )
 
     return {
         "before_you_pay": {
-            "title": "Before You Pay",
+            "title": "Your Personalized Safety Plan",
             "description": (
-                "Complete these safety checks before sending money, "
-                "sharing credentials, or proceeding with the offer."
+                "These steps are tailored to the warning signals and "
+                "verification items detected in the message. Complete "
+                "the relevant checks before sending money, sharing "
+                "information, or proceeding with the offer."
             ),
             "checks": checks,
             "can_proceed": False,
             "disclaimer": (
-                "These checks provide safety guidance only. "
-                "They do not establish whether an offer is genuine "
-                "or fraudulent."
+                "This is safety guidance, not financial advice. Warning "
+                "signals do not by themselves prove fraud, and the absence "
+                "of warning signals does not prove that an offer is safe."
             ),
         }
     }

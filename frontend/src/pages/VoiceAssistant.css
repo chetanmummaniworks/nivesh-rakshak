@@ -1,0 +1,98 @@
+.voice-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.voice-input-panel,
+.voice-result-panel {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.voice-input-panel h2 {
+  margin: 12px 0 8px;
+  color: #142f3a;
+}
+
+.voice-mic-icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: #e6f5ee;
+  font-size: 32px;
+}
+
+.voice-input-panel > .voice-mic-icon,
+.voice-input-panel > h2,
+.voice-input-panel > .voice-help {
+  text-align: center;
+}
+
+.voice-help,
+.voice-note {
+  color: #71827d;
+  line-height: 1.65;
+}
+
+.voice-actions {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.voice-input-panel form {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.voice-input-panel label {
+  color: #173b36;
+  font-weight: 600;
+}
+
+.voice-input-panel textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  border: 1px solid #e0eae5;
+  border-radius: 12px;
+  font: inherit;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.voice-input-panel textarea:focus {
+  outline: 3px solid #c9e8dc;
+  border-color: #147d64;
+}
+
+.voice-error {
+  color: #a83d36;
+  background: #fef3f2;
+  padding: 10px 12px;
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+.voice-result-panel {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .voice-workspace {
+    gap: 16px;
+  }
+
+  .voice-input-panel,
+  .voice-result-panel {
+    padding: 16px;
+  }
+}
